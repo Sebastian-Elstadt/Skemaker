@@ -1,0 +1,12 @@
+services:
+  api:
+    build: ./api
+    image: skemaker-api
+    container_name: skemaker-api
+    restart: unless-stopped
+    volumes:
+      - ./filestore.local:/app/filestore
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      FileStore__BasePath: /app/filestore

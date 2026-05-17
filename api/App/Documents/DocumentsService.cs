@@ -4,11 +4,11 @@ using Domain.Documents;
 
 namespace App.Documents;
 
-public class DocumentsService(IFileStorage fileStorage, IDocumentRepository repository) : IDocumentsService
+public class DocumentsService(IFileStore fileStore, IDocumentRepository repository) : IDocumentsService
 {
     public async Task<Guid> StoreDocumentAsync(Stream fileStream, string fileName, CancellationToken ct = default)
     {
-        string storedFilePath = await fileStorage.StoreAsync(fileStream, ct);
+        string storedFilePath = await fileStore.StoreAsync("documents", fileStream, ct);
 
         try
         {
@@ -18,7 +18,7 @@ public class DocumentsService(IFileStorage fileStorage, IDocumentRepository repo
         }
         catch
         {
-            await ExecutionUtils.GracefullyFailAsync(() => fileStorage.DeleteAsync(storedFilePath, ct));
+            ExecutionUtils.GracefullyFail(() => fileStore.Delete(storedFilePath));
             throw;
         }
     }

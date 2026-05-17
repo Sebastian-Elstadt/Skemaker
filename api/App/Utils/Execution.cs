@@ -17,4 +17,20 @@ public static class ExecutionUtils
             onFailure?.Invoke(ex);
         }
     }
+
+    public static async void GracefullyFail(Action func, Action<Exception>? onFailure = null)
+    {
+        try
+        {
+            func();
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            onFailure?.Invoke(ex);
+        }
+    }
 }
