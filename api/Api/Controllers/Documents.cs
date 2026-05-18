@@ -21,4 +21,18 @@ public class DocumentsController(IDocumentsService documents) : ControllerBase
         var docs = await documents.GetAllDocumentsAsync(HttpContext.RequestAborted);
         return Ok(docs);
     }
+
+    [HttpGet("{docId:Guid}/file")]
+    public async Task<IActionResult> GetDocumentFileAsync([FromRoute] Guid docId)
+    {
+        var docFile = await documents.GetDocumentFileAsync(docId, HttpContext.RequestAborted);
+        if (docFile is null) return NotFound();
+
+        return File(
+            docFile.Stream,
+            docFile.ContentType,
+            docFile.FileName,
+            enableRangeProcessing: true
+        );
+    }
 }

@@ -15,6 +15,22 @@ public class VolumeFileStore(FileStoreConfig config) : IFileStore
         }
     }
 
+    public Stream OpenReadStream(string filePath)
+    {
+        string fullPath = Path.Combine(config.BasePath, filePath);
+        if (!File.Exists(fullPath))
+            throw new FileNotFoundException("File not found in file store.", fullPath);
+
+        return new FileStream(
+            fullPath,
+            FileMode.Open,
+            FileAccess.Read,
+            FileShare.Read,
+            bufferSize: 81920,
+            options: FileOptions.Asynchronous | FileOptions.SequentialScan
+        );
+    }
+
     public async Task<(string filePath, string fileHash)> StoreAsync(string dirPath, Stream fileStream, CancellationToken ct = default)
     {
         string fullDirPath = Path.Combine(config.BasePath, dirPath);

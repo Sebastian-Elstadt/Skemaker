@@ -1,4 +1,3 @@
-using System.Text.Json;
 using App.Abstractions;
 using Domain.Documents;
 using Infra.Abstractions;
@@ -55,6 +54,16 @@ public class DocumentRepository(IQueryExecutor executor) : IDocumentRepository
         return executor.QuerySingleAsync(
             "SELECT * FROM documents WHERE file_hash = @fileHash",
             new { fileHash },
+            MapRow,
+            ct
+        );
+    }
+
+    public Task<Document?> GetByIdAsync(Guid id, CancellationToken ct = default)
+    {
+        return executor.QuerySingleAsync(
+            "SELECT * FROM documents WHERE id = @id",
+            new { id },
             MapRow,
             ct
         );

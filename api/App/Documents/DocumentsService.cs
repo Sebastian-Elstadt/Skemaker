@@ -39,4 +39,13 @@ public class DocumentsService(IFileStore fileStore, IRecordStore recordStore) : 
             d.SizeBytes
         ));
     }
+
+    public async Task<DocumentFile?> GetDocumentFileAsync(Guid id, CancellationToken ct = default)
+    {
+        var doc = await recordStore.DocumentRepository.GetByIdAsync(id, ct);
+        if (doc is null) return null;
+
+        var stream = fileStore.OpenReadStream(doc.FilePath);
+        return new(stream, doc.FileName, "application/octet-stream");
+    }
 }
