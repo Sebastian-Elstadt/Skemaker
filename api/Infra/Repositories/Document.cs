@@ -29,7 +29,7 @@ public class DocumentRepository(IQueryExecutor executor) : IDocumentRepository
                 doc.FileName,
                 doc.FilePath,
                 doc.FileHash,
-                doc.SizeBytes
+                SizeBytes = (int)doc.SizeBytes
             },
             ct
         );
