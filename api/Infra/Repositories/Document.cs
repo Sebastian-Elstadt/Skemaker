@@ -37,14 +37,10 @@ public class DocumentRepository(IQueryExecutor executor) : IDocumentRepository
 
     public Task<IEnumerable<Document>> GetAllAsync(CancellationToken ct = default)
     {
-        return executor.QueryAsync<Document>(
+        return executor.QueryAsync(
             "SELECT * FROM documents",
             null,
-            r =>
-            {
-                Console.WriteLine("GUID: " + r.id);
-                return MapRow(r);
-            },
+            MapRow,
             ct
         );
     }

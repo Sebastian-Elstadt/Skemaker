@@ -13,6 +13,8 @@ services:
       ASPNETCORE_URLS: http://+:8080
       FileStore__BasePath: /app/filestore
       RecordStore__ConnectionString: ${DB_CONNECTION_STRING}
+      xAi__BaseUrl: ${XAI_BASE_URL}
+      xAi__ApiKey: ${XAI_API_KEY}
     depends_on:
       postgres:
         condition: service_healthy

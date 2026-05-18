@@ -1,0 +1,9 @@
+CREATE TABLE document_analyses (
+    id            UUID          NOT NULL DEFAULT gen_random_uuid(),
+    created_on    TIMESTAMPTZ   NOT NULL DEFAULT now(),
+    document_id   UUID          NOT NULL REFERENCES documents(id) ON DELETE CASCADE,
+    "type"        SMALLINT      NOT NULL,
+    analysis_json TEXT          NOT NULL,
+
+    CONSTRAINT pk_document_analyses PRIMARY KEY (id)
+);

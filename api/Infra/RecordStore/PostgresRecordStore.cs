@@ -49,5 +49,8 @@ public class PostgresRecordStore : PostgresQueryExecutor, IRecordStore, IAsyncDi
     private IDocumentRepository? _documentRepository = null;
     public IDocumentRepository DocumentRepository { get => _documentRepository ??= new DocumentRepository(this); }
 
+    private IDocumentAnalysisRepository? _documentAnalysisRepository = null;
+    public IDocumentAnalysisRepository DocumentAnalysisRepository { get => _documentAnalysisRepository ??= new DocumentAnalysisRepository(this); }
+
     #endregion
 }

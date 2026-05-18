@@ -7,4 +7,5 @@ public interface IRecordStore
     Task RollbackTransactionAsync(CancellationToken ct = default);
 
     IDocumentRepository DocumentRepository { get; }
+    IDocumentAnalysisRepository DocumentAnalysisRepository { get; }
 }

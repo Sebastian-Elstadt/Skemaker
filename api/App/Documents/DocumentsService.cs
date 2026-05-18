@@ -4,7 +4,11 @@ using Domain.Documents;
 
 namespace App.Documents;
 
-public class DocumentsService(IFileStore fileStore, IRecordStore recordStore) : IDocumentsService
+public class DocumentsService(
+    IFileStore fileStore, 
+    IRecordStore recordStore,
+    IGdAndTAnalyzer gdAndTAnalyzer
+) : IDocumentsService
 {
     private const string DocumentsDirName = "documents";
 
@@ -47,5 +51,20 @@ public class DocumentsService(IFileStore fileStore, IRecordStore recordStore) : 
 
         var stream = fileStore.OpenReadStream(doc.FilePath);
         return new(stream, doc.FileName, "application/octet-stream");
+    }
+
+    public async Task<string> RunDocumentGdAndTAnalysisAsync(Guid id, CancellationToken ct = default)
+    {
+        var doc = await recordStore.DocumentRepository.GetByIdAsync(id, ct);
+        if (doc is null) throw new ArgumentException($"Document with ID {id} not found.");
+
+        var stream = fileStore.OpenReadStream(doc.FilePath);
+        var analysisJson = await gdAndTAnalyzer.AnalyzeDocumentAsync(stream, doc.FileName, ct);
+        stream.Dispose();
+
+        var analysis = new DocumentAnalysis(doc.Id, DocumentAnalysisType.GdAndT, analysisJson);
+        await recordStore.DocumentAnalysisRepository.AddAsync(analysis, ct);
+
+        return analysisJson;
     }
 }

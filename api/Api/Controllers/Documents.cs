@@ -35,4 +35,12 @@ public class DocumentsController(IDocumentsService documents) : ControllerBase
             enableRangeProcessing: true
         );
     }
+
+    [HttpPost("{docId:Guid}/analysis/gdAndT")]
+    public async Task<IActionResult> RunDocumentGdAndTAnalysisAsync([FromRoute] Guid docId)
+    {
+        // no need to get parsed result from service only to serialize again for response.
+        var resultJson = await documents.RunDocumentGdAndTAnalysisAsync(docId, HttpContext.RequestAborted);
+        return Content(resultJson, "application/json");
+    }
 }
