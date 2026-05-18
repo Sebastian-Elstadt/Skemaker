@@ -4,9 +4,43 @@ services:
     image: skemaker-api
     container_name: skemaker-api
     restart: unless-stopped
+    networks:
+      - skemaker
     volumes:
       - ./filestore.local:/app/filestore
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
       FileStore__BasePath: /app/filestore
+      RecordStore__ConnectionString: ${DB_CONNECTION_STRING}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:18.1-alpine
+    container_name: skemaker-postgres
+    restart: unless-stopped
+    networks:
+      - skemaker
+    expose:
+      - 5432
+    volumes:
+      - skemaker_postgres:/var/lib/postgresql
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  skemaker:
+    external: true
+
+volumes:
+  skemaker_postgres:
+    external: true

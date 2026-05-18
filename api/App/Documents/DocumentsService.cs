@@ -4,7 +4,7 @@ using Domain.Documents;
 
 namespace App.Documents;
 
-public class DocumentsService(IFileStore fileStore, IDocumentRepository repository) : IDocumentsService
+public class DocumentsService(IFileStore fileStore, IRecordStore recordStore) : IDocumentsService
 {
     public async Task<Guid> StoreDocumentAsync(Stream fileStream, string fileName, CancellationToken ct = default)
     {
@@ -13,7 +13,7 @@ public class DocumentsService(IFileStore fileStore, IDocumentRepository reposito
         try
         {
             var doc = new Document(fileName, storedFilePath);
-            await repository.AddAsync(doc, ct);
+            await recordStore.DocumentRepository.AddAsync(doc, ct);
             return doc.Id;
         }
         catch
