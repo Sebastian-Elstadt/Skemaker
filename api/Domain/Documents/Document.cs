@@ -5,6 +5,8 @@ public class Document
     public Guid Id { get; private init; } = Guid.NewGuid();
     public DateTime CreatedOn { get; private init; } = DateTime.UtcNow;
 
+    public uint SizeBytes { get; set; }
+
     private string _fileName = string.Empty;
     public string FileName
     {
@@ -69,11 +71,12 @@ public class Document
     }
 
     private Document() { }
-    public Document(string name, string path, string hash)
+    public Document(string name, string path, string hash, uint sizeBytes)
     {
         FileName = name;
         FilePath = path;
         FileHash = hash;
+        SizeBytes = sizeBytes;
     }
 
     public static Document Reconstitute(
@@ -81,13 +84,15 @@ public class Document
         DateTime createdOn,
         string fileName,
         string filePath,
-        string fileHash
+        string fileHash,
+        uint sizeBytes
     ) => new Document
     {
         Id = id,
         CreatedOn = createdOn,
         _fileName = fileName,
         _filePath = filePath,
-        _fileHash = fileHash
+        _fileHash = fileHash,
+        SizeBytes = sizeBytes
     };
 }

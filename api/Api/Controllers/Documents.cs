@@ -14,4 +14,11 @@ public class DocumentsController(IDocumentsService documents) : ControllerBase
         var docId = await documents.StoreDocumentAsync(stream, file.FileName, HttpContext.RequestAborted);
         return Ok(new { DocumentId = docId });
     }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAllAsync()
+    {
+        var docs = await documents.GetAllDocumentsAsync(HttpContext.RequestAborted);
+        return Ok(docs);
+    }
 }

@@ -26,8 +26,8 @@ public abstract class PostgresQueryExecutor : IQueryExecutor
             cancellationToken: ct
         );
 
-        var rows = await connection.QueryAsync<T>(cmd);
-        return rows.Select(row => rowMapFunc(row!));
+        var rows = await connection.QueryAsync(cmd);
+        return rows.Select(row => rowMapFunc((object)row));
     }
 
     public async Task<T?> QuerySingleAsync<T>(string query, object? param, Func<dynamic, T> rowMapFunc, CancellationToken ct = default, int timeoutSeconds = 180)
