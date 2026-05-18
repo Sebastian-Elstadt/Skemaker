@@ -16,6 +16,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    ports:
+      - "127.0.0.1:8000:8080"
 
   postgres:
     image: postgres:18.1-alpine

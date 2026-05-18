@@ -18,6 +18,8 @@ public static class ServiceCollectionExtensions
         if (recordStoreConfig is null || string.IsNullOrWhiteSpace(recordStoreConfig.ConnectionString))
             throw new InvalidOperationException("Invalid RecordStore configuration.");
 
+        PostgresMigrator.MigrateDatabase(recordStoreConfig);
+
         services.AddSingleton<IFileStore, VolumeFileStore>(sp => new VolumeFileStore(fileStoreConfig));
         services.AddScoped<IRecordStore, PostgresRecordStore>(sp => new PostgresRecordStore(recordStoreConfig));
         return services;

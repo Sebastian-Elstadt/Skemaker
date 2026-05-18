@@ -1,0 +1,9 @@
+CREATE TABLE documents (
+    id          UUID          NOT NULL DEFAULT gen_random_uuid(),
+    created_on  TIMESTAMPTZ   NOT NULL DEFAULT now(),
+    file_name   VARCHAR(255)  NOT NULL,
+    file_path   VARCHAR(4096) NOT NULL,
+    file_hash   VARCHAR(256)  NOT NULL,
+
+    CONSTRAINT pk_documents PRIMARY KEY (id)
+);

@@ -15,7 +15,7 @@ public class VolumeFileStore(FileStoreConfig config) : IFileStore
         }
     }
 
-    public async Task<string> StoreAsync(string dirPath, Stream fileStream, CancellationToken ct = default)
+    public async Task<(string filePath, string fileHash)> StoreAsync(string dirPath, Stream fileStream, CancellationToken ct = default)
     {
         string fullDirPath = Path.Combine(config.BasePath, dirPath);
         Directory.CreateDirectory(fullDirPath);
@@ -50,11 +50,11 @@ public class VolumeFileStore(FileStoreConfig config) : IFileStore
             if (File.Exists(finalPath))
             {
                 File.Delete(tempPath);
-                return fileHash;
+                return (Path.Combine(dirPath, fileHash), fileHash);
             }
 
             File.Move(tempPath, finalPath);
-            return Path.Combine(dirPath, fileHash);
+            return (Path.Combine(dirPath, fileHash), fileHash);
         }
         catch
         {

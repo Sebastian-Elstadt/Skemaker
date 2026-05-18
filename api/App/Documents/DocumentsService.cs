@@ -8,17 +8,20 @@ public class DocumentsService(IFileStore fileStore, IRecordStore recordStore) : 
 {
     public async Task<Guid> StoreDocumentAsync(Stream fileStream, string fileName, CancellationToken ct = default)
     {
-        string storedFilePath = await fileStore.StoreAsync("documents", fileStream, ct);
+        var (filePath, fileHash) = await fileStore.StoreAsync("documents", fileStream, ct);
 
         try
         {
-            var doc = new Document(fileName, storedFilePath);
+            var doc = await recordStore.DocumentRepository.GetByFileHashAsync(fileHash, ct);
+            if (doc is { }) return doc.Id;
+
+            doc = new Document(fileName, filePath, fileHash);
             await recordStore.DocumentRepository.AddAsync(doc, ct);
             return doc.Id;
         }
         catch
         {
-            ExecutionUtils.GracefullyFail(() => fileStore.Delete(storedFilePath));
+            ExecutionUtils.GracefullyFail(() => fileStore.Delete(filePath));
             throw;
         }
     }
