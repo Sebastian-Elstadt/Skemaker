@@ -55,12 +55,13 @@ public class xAiGdAndTAnalyzer(
         var xAiFileId = await uploadStore.GetFileIdByDocumentIdAsync(doc.Id, ct)
             ?? await UploadDocumentAsync(doc, ct);
 
-        using var response = await client.PostAsJsonAsync(
-            "v1/responses",
-            new
+        using var request = new HttpRequestMessage(HttpMethod.Post, "v1/responses")
+        {
+            Content = JsonContent.Create(new
             {
                 model = "grok-4.20-0309-reasoning",
                 max_output_tokens = 8000,
+                stream = true,
                 input = new object[] {
                     new {
                         role = "system",
@@ -169,11 +170,11 @@ public class xAiGdAndTAnalyzer(
                                             }
                                         },
                                         required = new string[]
-                                                    {
-                                                        "description",
-                                                        "nominal",
-                                                        "unit"
-                                                    }
+                                        {
+                                            "description",
+                                            "nominal",
+                                            "unit"
+                                        }
                                     }
                                 },
                                 gdandt = new
@@ -275,8 +276,10 @@ public class xAiGdAndTAnalyzer(
                         }
                     }
                 }
-            }
-        );
+            })
+        };
+
+        using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -284,7 +287,29 @@ public class xAiGdAndTAnalyzer(
             throw new InvalidOperationException($"xAI analysis request failed with status code {response.StatusCode}: {errorContent}");
         }
 
-        return await response.Content.ReadAsStringAsync(ct);
+        using var stream = await response.Content.ReadAsStreamAsync(ct);
+        using var reader = new StreamReader(stream);
+        var sb = new StringBuilder();
+
+        while (!reader.EndOfStream)
+        {
+            var line = await reader.ReadLineAsync(ct);
+            if (line is null || !line.StartsWith("data: ")) continue;
+
+            var data = line["data: ".Length..];
+            if (data == "[DONE]") break;
+
+            using var json = JsonDocument.Parse(data);
+            var root = json.RootElement;
+
+            if (
+                root.TryGetProperty("type", out var typeEl) &&
+                typeEl.GetString() == "response.output_text.delta" &&
+                root.TryGetProperty("delta", out var deltaEl)
+            ) sb.Append(deltaEl.GetString());
+        }
+
+        return sb.ToString();
     }
 
     public DocumentGdAndTAnalysis ParseAnalysis(string analysisJson)

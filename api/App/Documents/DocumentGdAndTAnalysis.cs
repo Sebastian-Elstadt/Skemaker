@@ -5,28 +5,28 @@ namespace App.Documents;
 public record DocumentGdAndTAnalysis
 {
     [JsonPropertyName("part_name")]
-    public string PartName { get; init; } = string.Empty;
+    public required string PartName { get; init; }
 
     [JsonPropertyName("part_number")]
     public string? PartNumber { get; init; }
 
     [JsonPropertyName("material")]
-    public string Material { get; init; } = string.Empty;
+    public required string Material { get; init; }
 
     [JsonPropertyName("overall_dimensions")]
-    public OverallDimensions OverallDimensions { get; init; } = new();
+    public required OverallDimensions OverallDimensions { get; init; }
 
     [JsonPropertyName("dimensions")]
-    public List<Dimension> Dimensions { get; init; } = new();
+    public required List<DimensionEntry> Dimensions { get; init; }
 
     [JsonPropertyName("gdandt")]
-    public List<GdAndT> GdAndT { get; init; } = new();
+    public required List<GdAndTEntry> GdAndT { get; init; }
 
     [JsonPropertyName("datums")]
-    public List<Datum> Datums { get; init; } = new();
+    public required List<DatumEntry> Datums { get; init; }
 
     [JsonPropertyName("notes")]
-    public List<string> Notes { get; init; } = new();
+    public required List<string> Notes { get; init; }
 
     [JsonPropertyName("surface_finish")]
     public string? SurfaceFinish { get; init; }
@@ -35,34 +35,34 @@ public record DocumentGdAndTAnalysis
     public string? GeneralTolerances { get; init; }
 
     [JsonPropertyName("confidence")]
-    public double Confidence { get; init; } = 0.0;
+    public required double Confidence { get; init; }
 }
 
 public record OverallDimensions
 {
     [JsonPropertyName("length")]
-    public double Length { get; init; }
+    public required double Length { get; init; }
 
     [JsonPropertyName("width")]
-    public double Width { get; init; }
+    public required double Width { get; init; }
 
     [JsonPropertyName("height")]
-    public double Height { get; init; }
+    public required double Height { get; init; }
 
     [JsonPropertyName("unit")]
-    public string Unit { get; init; } = "mm"; // "mm" or "inch"
+    public required string Unit { get; init; }
 }
 
-public record Dimension
+public record DimensionEntry
 {
     [JsonPropertyName("description")]
-    public string Description { get; init; } = string.Empty;
+    public required string Description { get; init; }
 
     [JsonPropertyName("nominal")]
-    public double Nominal { get; init; }
+    public required double Nominal { get; init; }
 
     [JsonPropertyName("tolerance")]
-    public string? Tolerance { get; init; } // e.g. "±0.1" or "0.05/0.00"
+    public string? Tolerance { get; init; }
 
     [JsonPropertyName("upper")]
     public double? Upper { get; init; }
@@ -71,34 +71,34 @@ public record Dimension
     public double? Lower { get; init; }
 
     [JsonPropertyName("unit")]
-    public string Unit { get; init; } = "mm";
+    public required string Unit { get; init; }
 }
 
-public record GdAndT
+public record GdAndTEntry
 {
     [JsonPropertyName("feature")]
-    public string Feature { get; init; } = string.Empty; // e.g. "Hole", "Surface A", "Boss"
+    public required string Feature { get; init; }
 
     [JsonPropertyName("symbol")]
-    public string Symbol { get; init; } = string.Empty; // e.g. "⌀", "▱", "⛢", "//"
+    public required string Symbol { get; init; }
 
     [JsonPropertyName("tolerance_value")]
-    public string ToleranceValue { get; init; } = string.Empty; // e.g. "0.02", "0.05 Ⓜ"
+    public required string ToleranceValue { get; init; }
 
     [JsonPropertyName("datums")]
-    public string? Datums { get; init; } // e.g. "A-B", "A"
+    public string? Datums { get; init; }
 
     [JsonPropertyName("modifiers")]
-    public string? Modifiers { get; init; } // e.g. "Ⓜ", "Ⓛ", "Ⓢ"
+    public string? Modifiers { get; init; }
 
     [JsonPropertyName("description")]
     public string? Description { get; init; }
 }
 
-public record Datum
+public record DatumEntry
 {
     [JsonPropertyName("letter")]
-    public string Letter { get; init; } = string.Empty; // A, B, C...
+    public required string Letter { get; init; }
 
     [JsonPropertyName("description")]
     public string? Description { get; init; }
