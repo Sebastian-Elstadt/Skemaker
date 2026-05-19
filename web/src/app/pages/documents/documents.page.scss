@@ -1,0 +1,92 @@
+:host { display: block; }
+
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  margin-bottom: 28px;
+}
+.page-header__top { display: flex; flex-direction: column; gap: 6px; max-width: 720px; }
+.page-header__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--color-text-faint);
+}
+.page-header__sub { margin-top: 4px; }
+.page-header__actions { display: flex; gap: 8px; }
+
+.alert {
+  border: 1px solid rgba(179, 38, 30, 0.4);
+  background: rgba(179, 38, 30, 0.06);
+  color: var(--color-danger);
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  margin-bottom: 16px;
+}
+
+.table-card { overflow: hidden; }
+
+.table {
+  display: flex;
+  flex-direction: column;
+}
+.table__head,
+.table__row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 0.8fr 1.2fr 32px;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 20px;
+}
+.table__head {
+  background: var(--color-surface-alt);
+  border-bottom: 1px solid var(--color-border);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.table__row {
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+  text-decoration: none;
+  transition: background 100ms ease;
+  border-left: none !important;
+}
+.table__row:last-child { border-bottom: none; }
+.table__row:hover { background: var(--color-surface-alt); border-bottom-color: var(--color-border); }
+.table__row:hover .arrow { transform: translateX(2px); color: var(--color-accent); }
+
+.filename { display: block; font-weight: 500; }
+.filename__id { display: block; font-size: 11px; margin-top: 3px; }
+
+.arrow {
+  display: inline-block;
+  transition: transform 120ms ease, color 120ms ease;
+  color: var(--color-text-faint);
+}
+
+.table__empty {
+  padding: 48px 20px;
+  text-align: center;
+}
+.empty__line {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  color: var(--color-text-muted);
+  display: block;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 880px) {
+  .table__head, .table__row {
+    grid-template-columns: 1fr auto;
+  }
+  .table__col--meta, .table__col--size, .table__col--end { display: none; }
+}

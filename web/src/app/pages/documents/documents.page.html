@@ -1,0 +1,57 @@
+<header class="page-header">
+  <div class="page-header__top">
+    <span class="page-header__eyebrow">PIPELINE / 01 — INTAKE</span>
+    <h1>Documents</h1>
+    <p class="page-header__sub">Technical drawings uploaded into the pipeline. Each document can be analyzed for GD&amp;T and translated to G-code.</p>
+  </div>
+
+  <div class="page-header__actions">
+    <label class="btn btn--accent" [class.btn--disabled]="uploading()">
+      <input type="file" hidden accept="application/pdf,image/*" (change)="onFileSelected($event)" [disabled]="uploading()" />
+      <span>{{ uploading() ? 'Uploading…' : 'Upload drawing' }}</span>
+    </label>
+    <button class="btn" (click)="refresh()" [disabled]="loading()">{{ loading() ? 'Loading…' : 'Refresh' }}</button>
+  </div>
+</header>
+
+@if (error(); as err) {
+  <div class="alert">{{ err }}</div>
+}
+
+<section class="card table-card">
+  <div class="table">
+    <div class="table__head">
+      <span class="table__col table__col--name">Name</span>
+      <span class="table__col table__col--meta">Hash</span>
+      <span class="table__col table__col--size">Size</span>
+      <span class="table__col table__col--date">Uploaded</span>
+      <span class="table__col table__col--end"></span>
+    </div>
+
+    @if (loading() && documents().length === 0) {
+      <div class="table__empty muted">Loading documents…</div>
+    } @else if (documents().length === 0) {
+      <div class="table__empty">
+        <div class="empty">
+          <span class="empty__line">NO DOCUMENTS YET</span>
+          <p class="muted">Upload a technical drawing to start the pipeline.</p>
+        </div>
+      </div>
+    } @else {
+      @for (doc of documents(); track doc.id) {
+        <a class="table__row" [routerLink]="['/documents', doc.id]">
+          <span class="table__col table__col--name">
+            <span class="filename">{{ doc.fileName }}</span>
+            <span class="filename__id mono faint">{{ doc.id }}</span>
+          </span>
+          <span class="table__col table__col--meta mono faint">{{ shortHash(doc.fileHash) }}</span>
+          <span class="table__col table__col--size mono">{{ formatSize(doc.sizeBytes) }}</span>
+          <span class="table__col table__col--date mono">{{ formatDate(doc.createdOn) }}</span>
+          <span class="table__col table__col--end">
+            <span class="arrow">&rarr;</span>
+          </span>
+        </a>
+      }
+    }
+  </div>
+</section>

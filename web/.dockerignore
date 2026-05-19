@@ -1,0 +1,11 @@
+node_modules
+dist
+.angular
+.git
+.gitignore
+*.log
+Dockerfile
+.dockerignore
+TODO.md
+README.md
+gcode-viewer-component-example.ts

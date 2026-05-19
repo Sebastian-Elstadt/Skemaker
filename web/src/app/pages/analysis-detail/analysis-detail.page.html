@@ -1,0 +1,212 @@
+<a class="back" routerLink="/documents">&larr; All documents</a>
+
+<header class="page-header">
+  <div class="page-header__top">
+    <span class="page-header__eyebrow">PIPELINE / 02 — ANALYSIS RESULT</span>
+    <h1>{{ parsed()?.part_name || 'Analysis' }}</h1>
+    @if (analysis(); as a) {
+      <div class="meta">
+        <span class="tag tag--accent">{{ analysisLabel(a.analysisType) }}</span>
+        @if (parsed()?.material; as m) {
+          <span class="tag">{{ m }}</span>
+        }
+        @if (parsed(); as pp) {
+          <span class="tag" [class.tag--positive]="pp.confidence >= 0.7">
+            confidence {{ (pp.confidence * 100).toFixed(0) }}%
+          </span>
+        }
+        <span class="mono faint">{{ a.analysisId }}</span>
+        <span class="mono muted">{{ formatDate(a.createdOn) }}</span>
+      </div>
+    }
+  </div>
+
+  <div class="page-header__actions">
+    <button class="btn btn--accent" (click)="toggleForm()">
+      {{ showForm() ? 'Hide form' : 'Translate to G-code' }}
+    </button>
+  </div>
+</header>
+
+@if (error(); as err) {
+  <div class="alert">{{ err }}</div>
+}
+
+@if (showForm()) {
+  <section class="surface-block form-block">
+    <h4>G-CODE TRANSLATION PARAMETERS</h4>
+    <p class="muted">These fields are sent to the translator alongside the extracted GD&amp;T.</p>
+
+    <div class="form-grid">
+      <label>
+        <span class="label">Machine type *</span>
+        <input class="input" [(ngModel)]="form.machineType" placeholder="3-axis CNC mill" />
+      </label>
+      <label>
+        <span class="label">Material</span>
+        <input class="input" [(ngModel)]="form.material" placeholder="Aluminum 6061-T6" />
+      </label>
+
+      <label>
+        <span class="label">Work offset *</span>
+        <input class="input" [(ngModel)]="form.workOffset" placeholder="G54" />
+      </label>
+      <label>
+        <span class="label">Work offset location *</span>
+        <input class="input" [(ngModel)]="form.workOffsetLocation" placeholder="top-center of stock" />
+      </label>
+
+      <label>
+        <span class="label">Operation strategy *</span>
+        <input class="input" [(ngModel)]="form.operationStrategy" placeholder="rough then finish" />
+      </label>
+      <label>
+        <span class="label">Coolant *</span>
+        <input class="input" [(ngModel)]="form.coolant" placeholder="flood / mist / none" />
+      </label>
+
+      <label>
+        <span class="label">Safe Z height *</span>
+        <input class="input" type="number" [(ngModel)]="form.safeZHeight" />
+      </label>
+      <div class="stock">
+        <span class="label">Stock size *</span>
+        <div class="stock__row">
+          <input class="input" type="number" [(ngModel)]="form.stockX" placeholder="X" />
+          <input class="input" type="number" [(ngModel)]="form.stockY" placeholder="Y" />
+          <input class="input" type="number" [(ngModel)]="form.stockZ" placeholder="Z" />
+          <select class="select" [(ngModel)]="form.stockUnit">
+            <option value="mm">mm</option>
+            <option value="inch">inch</option>
+          </select>
+        </div>
+      </div>
+
+      <fieldset class="tool">
+        <legend class="label">Primary tool</legend>
+        <div class="tool__row">
+          <input class="input" [(ngModel)]="form.toolName" placeholder="Name" />
+          <input class="input" type="number" [(ngModel)]="form.toolDiameter" placeholder="Ø mm" />
+          <input class="input" type="number" [(ngModel)]="form.toolFlutes" placeholder="Flutes" />
+          <input class="input" [(ngModel)]="form.toolMaterial" placeholder="Material" />
+        </div>
+      </fieldset>
+
+      <label class="full">
+        <span class="label">Additional notes</span>
+        <textarea class="textarea" rows="3" [(ngModel)]="form.additionalNotes"></textarea>
+      </label>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn--ghost" (click)="toggleForm()">Cancel</button>
+      <button class="btn btn--accent" (click)="submit()" [disabled]="translating()">
+        {{ translating() ? 'Translating…' : 'Run translation' }}
+      </button>
+    </div>
+  </section>
+}
+
+<div class="grid">
+  <section class="surface-block analysis-block">
+    <header class="block__head">
+      <h4>EXTRACTED DATA</h4>
+      <span class="mono faint">{{ analysis()?.analysisJson?.length || 0 }} chars</span>
+    </header>
+
+    @if (parsed(); as p) {
+      <dl class="overview">
+        <div><dt>Part name</dt><dd>{{ p.part_name }}</dd></div>
+        @if (p.part_number) { <div><dt>Part number</dt><dd class="mono">{{ p.part_number }}</dd></div> }
+        <div><dt>Material</dt><dd>{{ p.material }}</dd></div>
+        @if (p.overall_dimensions; as od) {
+          <div><dt>Overall</dt><dd class="mono">{{ od.length }} × {{ od.width }} × {{ od.height }} {{ od.unit }}</dd></div>
+        }
+        @if (p.surface_finish) { <div><dt>Surface finish</dt><dd>{{ p.surface_finish }}</dd></div> }
+        @if (p.general_tolerances) { <div><dt>General tol.</dt><dd>{{ p.general_tolerances }}</dd></div> }
+      </dl>
+
+      @if (p.gdandt.length) {
+        <h4 class="section-title">GD&amp;T CALLOUTS · {{ p.gdandt.length }}</h4>
+        <div class="data-table">
+          <div class="data-table__head">
+            <span>Feature</span>
+            <span>Symbol</span>
+            <span>Tolerance</span>
+            <span>Datums</span>
+          </div>
+          @for (g of p.gdandt; track $index) {
+            <div class="data-table__row">
+              <span>{{ g.feature }}</span>
+              <span class="mono">{{ g.symbol }}</span>
+              <span class="mono">{{ g.tolerance_value }}</span>
+              <span class="mono">{{ g.datums }}</span>
+            </div>
+          }
+        </div>
+      }
+
+      @if (p.dimensions.length) {
+        <h4 class="section-title">DIMENSIONS · {{ p.dimensions.length }}</h4>
+        <div class="data-table">
+          <div class="data-table__head">
+            <span>Description</span>
+            <span>Nominal</span>
+            <span>Tolerance</span>
+            <span>Unit</span>
+          </div>
+          @for (d of p.dimensions; track $index) {
+            <div class="data-table__row">
+              <span>{{ d.description }}</span>
+              <span class="mono">{{ d.nominal }}</span>
+              <span class="mono">{{ d.tolerance || '—' }}</span>
+              <span class="mono">{{ d.unit }}</span>
+            </div>
+          }
+        </div>
+      }
+
+      @if (p.notes.length) {
+        <h4 class="section-title">NOTES</h4>
+        <ul class="notes">
+          @for (n of p.notes; track $index) { <li>{{ n }}</li> }
+        </ul>
+      }
+    } @else if (loadingAnalysis()) {
+      <p class="muted">Loading analysis…</p>
+    } @else {
+      <pre class="raw">{{ analysis()?.analysisJson }}</pre>
+    }
+  </section>
+
+  <section class="surface-block translations-block">
+    <header class="block__head">
+      <h4>TRANSLATIONS</h4>
+      <button class="btn btn--ghost btn--sm" (click)="loadTranslations()" [disabled]="loadingTranslations()">Refresh</button>
+    </header>
+
+    @if (loadingTranslations() && translations().length === 0) {
+      <p class="muted">Loading…</p>
+    } @else if (translations().length === 0) {
+      <div class="empty">
+        <span class="empty__line">NO TRANSLATIONS YET</span>
+        <p class="muted">Translate this analysis into manufacturing G-code with your machine parameters.</p>
+      </div>
+    } @else {
+      <ul class="t-list">
+        @for (t of translations(); track t.id) {
+          <li>
+            <a class="t-item" [routerLink]="['/translations', t.id]">
+              <span class="t-row">
+                <span class="tag tag--accent">{{ targetLabel(t.target) }}</span>
+                <span class="mono faint">{{ t.id }}</span>
+              </span>
+              <span class="mono muted">{{ formatDate(t.createdOn) }}</span>
+              <span class="arrow">&rarr;</span>
+            </a>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+</div>

@@ -1,0 +1,65 @@
+@if (translation(); as t) {
+  <a class="back" [routerLink]="['/analyses', t.analysisId]">&larr; Back to analysis</a>
+}
+
+<header class="page-header">
+  <div class="page-header__top">
+    <span class="page-header__eyebrow">PIPELINE / 03 — TRANSLATION</span>
+    <h1>G-code translation</h1>
+    @if (translation(); as t) {
+      <div class="meta">
+        <span class="tag tag--accent">{{ targetLabel(t.target) }}</span>
+        <span class="tag">{{ lineCount() }} lines</span>
+        <span class="mono faint">{{ t.id }}</span>
+        <span class="mono muted">{{ formatDate(t.createdOn) }}</span>
+      </div>
+    }
+  </div>
+
+  <div class="page-header__actions">
+    <button class="btn" (click)="copyGCode()" [disabled]="!gcodeText()">Copy</button>
+    <button class="btn btn--primary" (click)="download()" [disabled]="!gcodeText()">Download .gcode</button>
+  </div>
+</header>
+
+@if (error(); as err) {
+  <div class="alert">{{ err }}</div>
+}
+
+@if (loading() && !translation()) {
+  <p class="muted">Loading translation…</p>
+}
+
+@if (translation()) {
+  @if (strategySummary()) {
+    <section class="strategy">
+      <button class="strategy__toggle" (click)="toggleStrategy()">
+        <h4>STRATEGY SUMMARY</h4>
+        <span class="mono faint">{{ showStrategy() ? '−' : '+' }}</span>
+      </button>
+      @if (showStrategy()) {
+        <pre class="strategy__body">{{ strategySummary() }}</pre>
+      }
+    </section>
+  }
+
+  <div class="viewer-grid">
+    <section class="pane pane--code">
+      <header class="pane__head">
+        <h4>G-CODE</h4>
+        <span class="mono faint">{{ lineCount() }} lines</span>
+      </header>
+      <pre class="pane__body code-block">{{ gcodeText() }}</pre>
+    </section>
+
+    <section class="pane pane--viewer">
+      <header class="pane__head">
+        <h4>TOOLPATH</h4>
+        <span class="mono faint">3D RENDER</span>
+      </header>
+      <div class="pane__body viewer-body">
+        <app-gcode-viewer [gcodeText]="gcodeText()" />
+      </div>
+    </section>
+  </div>
+}

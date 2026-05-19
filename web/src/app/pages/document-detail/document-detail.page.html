@@ -1,0 +1,69 @@
+<a class="back" routerLink="/documents">&larr; All documents</a>
+
+<header class="page-header">
+  <div class="page-header__top">
+    <span class="page-header__eyebrow">PIPELINE / 02 — ANALYSIS</span>
+    @if (document(); as d) {
+      <h1>{{ d.fileName }}</h1>
+      <div class="meta">
+        <span class="tag">{{ formatSize(d.sizeBytes) }}</span>
+        <span class="mono faint">{{ d.id }}</span>
+        <span class="mono muted">Uploaded {{ formatDate(d.createdOn) }}</span>
+      </div>
+    } @else if (loadingDoc()) {
+      <h1>Loading…</h1>
+    } @else {
+      <h1>Document not found</h1>
+    }
+  </div>
+
+  <div class="page-header__actions">
+    <a class="btn" [href]="fileUrl()" target="_blank" rel="noopener">Open file</a>
+    <button class="btn btn--accent" (click)="runGdAndT()" [disabled]="running() || !document()">
+      {{ running() ? 'Running…' : 'Run GD&T analysis' }}
+    </button>
+  </div>
+</header>
+
+@if (error(); as err) {
+  <div class="alert">{{ err }}</div>
+}
+
+<div class="grid">
+  <section class="surface-block preview">
+    <h4>SOURCE FILE</h4>
+    <iframe class="preview__frame" [src]="safeFileUrl()" title="document preview" loading="lazy"></iframe>
+    <p class="muted">If the file does not render inline, use “Open file” to view in a new tab.</p>
+  </section>
+
+  <section class="surface-block analyses">
+    <header class="block__head">
+      <h4>ANALYSES</h4>
+      <button class="btn btn--ghost btn--sm" (click)="loadAnalyses()" [disabled]="loadingAnalyses()">Refresh</button>
+    </header>
+
+    @if (loadingAnalyses() && analyses().length === 0) {
+      <p class="muted">Loading…</p>
+    } @else if (analyses().length === 0) {
+      <div class="empty">
+        <span class="empty__line">NO ANALYSES YET</span>
+        <p class="muted">Trigger a GD&amp;T analysis to extract features, dimensions, and tolerances from this drawing.</p>
+      </div>
+    } @else {
+      <ul class="analyses__list">
+        @for (a of analyses(); track a.analysisId) {
+          <li>
+            <a class="analyses__item" [routerLink]="['/analyses', a.analysisId]">
+              <span class="analyses__row">
+                <span class="tag tag--accent">{{ analysisLabel(a.analysisType) }}</span>
+                <span class="mono faint">{{ a.analysisId }}</span>
+              </span>
+              <span class="mono muted">{{ formatDate(a.createdOn) }}</span>
+              <span class="arrow">&rarr;</span>
+            </a>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+</div>
