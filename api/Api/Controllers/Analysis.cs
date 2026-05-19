@@ -6,10 +6,7 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("analysis")]
-public class AnalysisController(
-    IDocumentAnalysisService analysisService,
-    IAnalysisTranslationService analysisTranslationService
-) : ControllerBase
+public class AnalysisController(IDocumentAnalysisService analysisService) : ControllerBase
 {
     [HttpPost("gdAndT")]
     public async Task<IActionResult> CreateGdAndTAnalysisAsync([FromBody] CreateGdAndTAnalysisRequest req)
@@ -23,16 +20,6 @@ public class AnalysisController(
     {
         var list = await analysisService.GetByDocumentIdAsync(docId, HttpContext.RequestAborted);
         return Ok(list);
-    }
-
-    [HttpPost("{analysisId:Guid}/translate/gCode")]
-    public async Task<IActionResult> TranslateAnalysisToGCodeAsync(
-        [FromRoute] Guid analysisId,
-        [FromBody] TranslateAnalysisToGCodeRequest req
-    )
-    {
-        await analysisTranslationService.TranslateToGCodeAsync(analysisId, req.ToTranslateToGCodeOptions(), HttpContext.RequestAborted);
-        return Ok();
     }
 
     [HttpGet("{analysisId:Guid}")]

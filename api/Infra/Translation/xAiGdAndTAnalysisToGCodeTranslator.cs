@@ -11,7 +11,7 @@ public class xAiGdAndTAnalysisToGCodeTranslator(
     xAiUploadStore uploadStore
 ) : IGdAndTAnalysisToGCodeTranslator
 {
-    public async Task<ToGCodeTranslationResult> TranslateAsync(DocumentAnalysis analysis, TranslateToGCodeOptions options, CancellationToken ct = default)
+    public async Task<GCodeTranslation> TranslateAsync(DocumentAnalysis analysis, GCodeManufacturingOptions options, CancellationToken ct = default)
     {
         if (analysis.Type != DocumentAnalysisType.GdAndT)
             throw new ArgumentException($"Expected DocumentAnalysisType.GdAndT but got {analysis.Type}");

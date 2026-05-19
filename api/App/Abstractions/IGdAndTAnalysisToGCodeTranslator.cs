@@ -5,5 +5,5 @@ namespace App.Abstractions;
 
 public interface IGdAndTAnalysisToGCodeTranslator
 {
-    Task<ToGCodeTranslationResult> TranslateAsync(DocumentAnalysis analysis, TranslateToGCodeOptions options, CancellationToken ct = default);
+    Task<GCodeTranslation> TranslateAsync(DocumentAnalysis analysis, GCodeManufacturingOptions options, CancellationToken ct = default);
 }

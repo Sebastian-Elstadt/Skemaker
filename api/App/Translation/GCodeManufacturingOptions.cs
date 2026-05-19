@@ -1,6 +1,6 @@
 namespace App.Translation;
 
-public record TranslateToGCodeOptions
+public record GCodeManufacturingOptions
 {
     public required string MachineType { get; set; }
     public string? Material { get; set; }

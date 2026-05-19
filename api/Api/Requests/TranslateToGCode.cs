@@ -2,7 +2,7 @@ using App.Translation;
 
 namespace Api.Requests;
 
-public record TranslateAnalysisToGCodeRequest
+public record TranslateToGCodeRequest
 {
     public required string MachineType { get; set; }
     public string? Material { get; set; }
@@ -33,20 +33,20 @@ public record TranslateAnalysisToGCodeRequest
         public required string Material { get; set; }
     }
 
-    public TranslateToGCodeOptions ToTranslateToGCodeOptions()
+    public GCodeManufacturingOptions ToGCodeManufacturingOptions()
     {
-        return new TranslateToGCodeOptions
+        return new GCodeManufacturingOptions
         {
             MachineType = MachineType,
             Material = Material,
-            StockSize = new TranslateToGCodeOptions.StockSizeData
+            StockSize = new GCodeManufacturingOptions.StockSizeData
             {
                 X = StockSize.X,
                 Y = StockSize.Y,
                 Z = StockSize.Z,
                 Unit = StockSize.Unit
             },
-            Tools = Tools.Select(t => new TranslateToGCodeOptions.ToolDefinitionData
+            Tools = Tools.Select(t => new GCodeManufacturingOptions.ToolDefinitionData
             {
                 Name = t.Name,
                 Diameter = t.Diameter,

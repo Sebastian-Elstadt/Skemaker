@@ -1,6 +1,6 @@
 namespace App.Translation;
 
-public record ToGCodeTranslationResult(
+public record GCodeTranslation(
     string FullResult,
     string StrategySummary,
     string GCode
