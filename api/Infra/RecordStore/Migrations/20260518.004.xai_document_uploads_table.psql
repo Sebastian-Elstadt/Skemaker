@@ -1,6 +1,6 @@
 CREATE TABLE xai_document_uploads (
     document_id   UUID        NOT NULL REFERENCES documents(id) ON DELETE CASCADE,
-    file_id       TEXT        NOT NULL
+    file_id       TEXT        NOT NULL,
     created_on    TIMESTAMPTZ NOT NULL DEFAULT now(),
 
     CONSTRAINT pk_xai_document_uploads PRIMARY KEY (document_id, file_id)

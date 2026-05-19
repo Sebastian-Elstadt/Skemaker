@@ -1,5 +1,6 @@
 using System.Net.Http.Headers;
 using App.Abstractions;
+using Infra.Abstractions;
 using Infra.Documents;
 using Infra.FileStorage;
 using Infra.RecordStore;
@@ -27,7 +28,10 @@ public static class ServiceCollectionExtensions
         PostgresMigrator.MigrateDatabase(recordStoreConfig);
 
         services.AddSingleton<IFileStore, VolumeFileStore>(sp => new VolumeFileStore(fileStoreConfig));
-        services.AddScoped<IRecordStore, PostgresRecordStore>(sp => new PostgresRecordStore(recordStoreConfig));
+
+        services.AddScoped(sp => new PostgresRecordStore(recordStoreConfig));
+        services.AddScoped<IRecordStore>(sp => sp.GetRequiredService<PostgresRecordStore>());
+        services.AddScoped<IQueryExecutor>(sp => sp.GetRequiredService<PostgresRecordStore>()); // for infra-internal exposure
 
         services.AddScoped<xAiUploadStore>();
         services.AddHttpClient<IGdAndTAnalyzer, xAiGdAndTAnalyzer>(client =>
@@ -35,7 +39,7 @@ public static class ServiceCollectionExtensions
             client.BaseAddress = new Uri(xAiConfig.BaseUrl);
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", xAiConfig.ApiKey);
         });
-        
+
         return services;
     }
 }

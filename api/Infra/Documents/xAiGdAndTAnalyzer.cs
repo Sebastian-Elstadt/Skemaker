@@ -21,8 +21,9 @@ public class xAiGdAndTAnalyzer(
         using var fileContent = new StreamContent(fileStream);
         fileContent.Headers.ContentType = new MediaTypeHeaderValue(doc.ContentType);
 
-        form.Add(fileContent, "file", doc.FileName);
+        form.Add(new StringContent("86400"), "expires_after");
         form.Add(new StringContent("assistants"), "purpose");
+        form.Add(fileContent, "file", doc.FileName);
 
         using var request = new HttpRequestMessage(HttpMethod.Post, "/v1/files")
         {
