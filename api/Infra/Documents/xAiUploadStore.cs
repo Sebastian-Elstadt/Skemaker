@@ -17,7 +17,7 @@ public class xAiUploadStore(IQueryExecutor executor)
     public Task SetFileIdForDocumentIdAsync(Guid documentId, string fileId, CancellationToken ct = default)
     {
         return executor.ExecuteAsync(
-            "UPDATE xai_document_uploads SET file_id = @fileId WHERE document_id = @documentId",
+            "INSERT INTO xai_document_uploads (document_id, file_id) VALUES (@documentId, @fileId) ON CONFLICT (document_id) DO UPDATE SET file_id = @fileId",
             new { documentId, fileId },
             ct
         );

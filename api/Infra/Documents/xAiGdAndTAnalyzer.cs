@@ -1,5 +1,6 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
 using App.Abstractions;
 using App.Documents;
@@ -55,11 +56,12 @@ public class xAiGdAndTAnalyzer(
             ?? await UploadDocumentAsync(doc, ct);
 
         using var response = await client.PostAsJsonAsync(
-            "v1/chat/completions",
+            "v1/responses",
             new
             {
-                model = "grok-4.3",
-                messages = new object[] {
+                model = "grok-4.20-0309-reasoning",
+                max_output_tokens = 8000,
+                input = new object[] {
                     new {
                         role = "system",
                         content = "You are an expert mechanical engineer specialized in reading technical drawings and GD&T per ASME Y14.5."
@@ -68,7 +70,7 @@ public class xAiGdAndTAnalyzer(
                         role = "user",
                         content = new object[] {
                             new {
-                                type = "text",
+                                type = "input_text",
                                 text = "Extract all information from the attached technical drawing according to the provided schema."
                             },
                             new {
@@ -78,11 +80,11 @@ public class xAiGdAndTAnalyzer(
                         }
                     }
                 },
-                response_format = new
+                text = new
                 {
-                    type = "json_schema",
-                    json_schema = new
+                    format = new
                     {
+                        type = "json_schema",
                         name = "drawing_extraction",
                         strict = true,
                         schema = new
@@ -123,15 +125,15 @@ public class xAiGdAndTAnalyzer(
                                         {
                                             type = "string",
                                             @enum = new string[]{ "mm", "inch"
-                                        }
+                                                    }
                                         }
                                     },
                                     required = new string[] {
-                                        "length",
-                                        "width",
-                                        "height",
-                                        "unit"
-                                    }
+                                                    "length",
+                                                    "width",
+                                                    "height",
+                                                    "unit"
+                                                }
                                 },
                                 dimensions = new
                                 {
@@ -167,11 +169,11 @@ public class xAiGdAndTAnalyzer(
                                             }
                                         },
                                         required = new string[]
-                                        {
-                                            "description",
-                                            "nominal",
-                                            "unit"
-                                        }
+                                                    {
+                                                        "description",
+                                                        "nominal",
+                                                        "unit"
+                                                    }
                                     }
                                 },
                                 gdandt = new
@@ -208,11 +210,11 @@ public class xAiGdAndTAnalyzer(
                                             }
                                         },
                                         required = new string[]
-                                        {
-                                            "feature",
-                                            "symbol",
-                                            "tolerance_value"
-                                        }
+                                                    {
+                                                        "feature",
+                                                        "symbol",
+                                                        "tolerance_value"
+                                                    }
                                     }
                                 },
                                 datums = new
@@ -272,9 +274,7 @@ public class xAiGdAndTAnalyzer(
                             additionalProperties = false
                         }
                     }
-                },
-                temperature = 0.0,
-                max_tokens = 8000
+                }
             }
         );
 

@@ -38,6 +38,7 @@ public static class ServiceCollectionExtensions
         {
             client.BaseAddress = new Uri(xAiConfig.BaseUrl);
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", xAiConfig.ApiKey);
+            client.Timeout = TimeSpan.FromMinutes(10);
         });
 
         return services;

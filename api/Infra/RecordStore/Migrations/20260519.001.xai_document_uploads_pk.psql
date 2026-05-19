@@ -1,0 +1,3 @@
+ALTER TABLE xai_document_uploads
+    DROP CONSTRAINT pk_xai_document_uploads,
+    ADD CONSTRAINT pk_xai_document_uploads PRIMARY KEY (document_id);
