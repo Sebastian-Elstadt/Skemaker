@@ -11,7 +11,7 @@ public class DocumentsController(IDocumentsService documents) : ControllerBase
     public async Task<IActionResult> CreateAsync(IFormFile file)
     {
         using var stream = file.OpenReadStream();
-        var docId = await documents.StoreDocumentAsync(stream, file.FileName, HttpContext.RequestAborted);
+        var docId = await documents.StoreDocumentAsync(stream, file.FileName, file.ContentType, HttpContext.RequestAborted);
         return Ok(new { DocumentId = docId });
     }
 

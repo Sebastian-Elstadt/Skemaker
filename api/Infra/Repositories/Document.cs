@@ -12,15 +12,16 @@ public class DocumentRepository(IQueryExecutor executor) : IDocumentRepository
         (string)row.file_name,
         (string)row.file_path,
         (string)row.file_hash,
-        Convert.ToUInt32(row.size_bytes)
+        Convert.ToUInt32(row.size_bytes),
+        (string)row.content_type
     );
 
     public async Task AddAsync(Document doc, CancellationToken ct = default)
     {
         await executor.ExecuteAsync(
             """
-            INSERT INTO documents (id, created_on, file_name, file_path, file_hash, size_bytes)
-            VALUES (@Id, @CreatedOn, @FileName, @FilePath, @FileHash, @SizeBytes);
+            INSERT INTO documents (id, created_on, file_name, file_path, file_hash, size_bytes, content_type)
+            VALUES (@Id, @CreatedOn, @FileName, @FilePath, @FileHash, @SizeBytes, @ContentType);
             """,
             new
             {
@@ -29,7 +30,8 @@ public class DocumentRepository(IQueryExecutor executor) : IDocumentRepository
                 doc.FileName,
                 doc.FilePath,
                 doc.FileHash,
-                SizeBytes = (int)doc.SizeBytes
+                SizeBytes = (int)doc.SizeBytes,
+                doc.ContentType
             },
             ct
         );

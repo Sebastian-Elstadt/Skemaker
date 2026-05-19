@@ -11,17 +11,19 @@ public class DocumentsService(
 ) : IDocumentsService
 {
     private const string DocumentsDirName = "documents";
+    private const string DefaultContentType = "application/octet-stream";
 
-    public async Task<Guid> StoreDocumentAsync(Stream fileStream, string fileName, CancellationToken ct = default)
+    public async Task<Guid> StoreDocumentAsync(Stream fileStream, string fileName, string? contentType, CancellationToken ct = default)
     {
         var (filePath, fileHash) = await fileStore.StoreAsync(DocumentsDirName, fileStream, ct);
+        contentType = NormalizeContentType(contentType);
 
         try
         {
             var doc = await recordStore.DocumentRepository.GetByFileHashAsync(fileHash, ct);
             if (doc is { }) return doc.Id;
 
-            doc = new Document(fileName, filePath, fileHash, (uint)fileStream.Length);
+            doc = new Document(fileName, filePath, contentType, fileHash, (uint)fileStream.Length);
             await recordStore.DocumentRepository.AddAsync(doc, ct);
             return doc.Id;
         }
@@ -50,7 +52,7 @@ public class DocumentsService(
         if (doc is null) return null;
 
         var stream = fileStore.OpenReadStream(doc.FilePath);
-        return new(stream, doc.FileName, "application/octet-stream");
+        return new(stream, doc.FileName, doc.ContentType);
     }
 
     public async Task<string> RunDocumentGdAndTAnalysisAsync(Guid id, CancellationToken ct = default)
@@ -58,13 +60,27 @@ public class DocumentsService(
         var doc = await recordStore.DocumentRepository.GetByIdAsync(id, ct);
         if (doc is null) throw new ArgumentException($"Document with ID {id} not found.");
 
-        var stream = fileStore.OpenReadStream(doc.FilePath);
-        var analysisJson = await gdAndTAnalyzer.AnalyzeDocumentAsync(stream, doc.FileName, ct);
-        stream.Dispose();
-
+        var analysisJson = await gdAndTAnalyzer.AnalyzeDocumentAsync(doc, ct);
         var analysis = new DocumentAnalysis(doc.Id, DocumentAnalysisType.GdAndT, analysisJson);
         await recordStore.DocumentAnalysisRepository.AddAsync(analysis, ct);
 
         return analysisJson;
+    }
+
+    private static string NormalizeContentType(string? contentType)
+    {
+        if (string.IsNullOrWhiteSpace(contentType))
+            return DefaultContentType;
+
+        contentType = contentType.Trim().ToLowerInvariant();
+        
+        var slashIdx = contentType.IndexOf('/');
+        if (slashIdx <= 0 || slashIdx >= contentType.Length - 1)
+            return DefaultContentType;
+
+        if (contentType.Contains(' ') || contentType.Contains(';') || contentType.Contains(',') || contentType.Contains('\r') || contentType.Contains('\n'))
+            return DefaultContentType;
+
+        return contentType;
     }
 }
