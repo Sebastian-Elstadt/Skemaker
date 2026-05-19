@@ -7,6 +7,18 @@ public class Document
 
     public uint SizeBytes { get; set; }
 
+    private string _contentType = string.Empty;
+    public string ContentType
+    {
+        get => _contentType;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ArgumentException("Content type cannot be null or whitespace.");
+            _contentType = value.Trim();
+        }
+    }
+
     private string _fileName = string.Empty;
     public string FileName
     {
@@ -71,12 +83,13 @@ public class Document
     }
 
     private Document() { }
-    public Document(string name, string path, string hash, uint sizeBytes)
+    public Document(string name, string path, string contentType, string hash, uint sizeBytes)
     {
         FileName = name;
         FilePath = path;
         FileHash = hash;
         SizeBytes = sizeBytes;
+        ContentType = contentType;
     }
 
     public static Document Reconstitute(
@@ -85,7 +98,8 @@ public class Document
         string fileName,
         string filePath,
         string fileHash,
-        uint sizeBytes
+        uint sizeBytes,
+        string contentType
     ) => new Document
     {
         Id = id,
@@ -93,6 +107,7 @@ public class Document
         _fileName = fileName,
         _filePath = filePath,
         _fileHash = fileHash,
-        SizeBytes = sizeBytes
+        SizeBytes = sizeBytes,
+        _contentType = contentType
     };
 }
