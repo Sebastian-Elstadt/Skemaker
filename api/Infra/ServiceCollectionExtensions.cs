@@ -1,7 +1,7 @@
 using System.Net.Http.Headers;
 using App.Abstractions;
 using Infra.Abstractions;
-using Infra.Documents;
+using Infra.Analysis;
 using Infra.FileStorage;
 using Infra.RecordStore;
 using Microsoft.Extensions.Configuration;

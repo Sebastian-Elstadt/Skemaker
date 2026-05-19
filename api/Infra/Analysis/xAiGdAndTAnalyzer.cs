@@ -3,10 +3,10 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using App.Abstractions;
-using App.Documents;
+using App.Analysis;
 using Domain.Documents;
 
-namespace Infra.Documents;
+namespace Infra.Analysis;
 
 public class xAiGdAndTAnalyzer(
     HttpClient client,
