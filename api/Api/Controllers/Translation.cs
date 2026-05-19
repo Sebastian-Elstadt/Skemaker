@@ -9,12 +9,9 @@ namespace Api.Controllers;
 public class TranslationController(IAnalysisTranslationService translationService) : ControllerBase
 {
     [HttpPost("gCode")]
-    public async Task<IActionResult> TranslateToGCodeAsync(
-        [FromRoute] Guid analysisId,
-        [FromBody] TranslateToGCodeRequest req
-    )
+    public async Task<IActionResult> TranslateToGCodeAsync([FromBody] TranslateToGCodeRequest req)
     {
-        var result = await translationService.TranslateToGCodeAsync(analysisId, req.ToGCodeManufacturingOptions(), HttpContext.RequestAborted);
+        var result = await translationService.TranslateToGCodeAsync(req.AnalysisId, req.ToGCodeManufacturingOptions(), HttpContext.RequestAborted);
         return Ok(result);
     }
 

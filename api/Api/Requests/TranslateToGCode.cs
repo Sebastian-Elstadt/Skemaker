@@ -4,6 +4,8 @@ namespace Api.Requests;
 
 public record TranslateToGCodeRequest
 {
+    public Guid AnalysisId { get; set; }
+
     public required string MachineType { get; set; }
     public string? Material { get; set; }
 

@@ -1,0 +1,31 @@
+{
+  "AnalysisId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "MachineType": "3-axis vertical mill",
+  "Material": "304 Stainless Steel",
+  "StockSize": {
+    "X": 8.0,
+    "Y": 6.0,
+    "Z": 0.25,
+    "Unit": "inch"
+  },
+  "Tools": [
+    {
+      "Name": "1/4\" Flat End Mill",
+      "Diameter": 0.25,
+      "Flutes": 4,
+      "Material": "Carbide"
+    },
+    {
+      "Name": "1/8\" Drill",
+      "Diameter": 0.125,
+      "Flutes": 2,
+      "Material": "HSS"
+    }
+  ],
+  "WorkOffset": "G54",
+  "WorkOffsetLocation": "top_center",
+  "OperationStrategy": "rough + finish",
+  "Coolant": "flood",
+  "SafeZHeight": 0.5,
+  "AdditionalNotes": "This is thin sheet metal (0.1195\" thick). Prefer contour profiling over deep pocketing."
+}
