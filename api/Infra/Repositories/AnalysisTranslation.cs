@@ -11,6 +11,7 @@ public class AnalysisTranslationRepository(IQueryExecutor executor) : IAnalysisT
         id: (Guid)row.id,
         createdOn: (DateTime)row.created_on,
         analysisId: (Guid)row.analysis_id,
+        target: (AnalysisTranslationTarget)row.target,
         translation: JsonSerializer.Deserialize<TTranslation>((string)row.translation_json)
             ?? throw new InvalidOperationException($"Failed to deserialize translation JSON for analysis translation with ID {row.id}")
     );
@@ -19,14 +20,15 @@ public class AnalysisTranslationRepository(IQueryExecutor executor) : IAnalysisT
     {
         return executor.ExecuteAsync(
             """
-            INSERT INTO analysis_translations (id, created_on, analysis_id, translation_json)
-            VALUES (@Id, @CreatedOn, @AnalysisId, @TranslationJson::jsonb);
+            INSERT INTO analysis_translations (id, created_on, analysis_id, "target", translation_json)
+            VALUES (@Id, @CreatedOn, @AnalysisId, @Target, @TranslationJson::jsonb);
             """,
             new
             {
                 translation.Id,
                 translation.CreatedOn,
                 translation.AnalysisId,
+                Target = (short)translation.Target,
                 TranslationJson = JsonSerializer.Serialize(translation.Translation)
             },
             ct

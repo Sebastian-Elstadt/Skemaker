@@ -28,7 +28,7 @@ public class TranslationController(IAnalysisTranslationService translationServic
     [HttpGet("{translationId:Guid}")]
     public async Task<IActionResult> GetByIdAsync([FromRoute] Guid translationId)
     {
-        var translation = await translationService.GetByIdAsync(translationId, HttpContext.RequestAborted);
+        var translation = await translationService.GetByIdAsync<object>(translationId, HttpContext.RequestAborted);
         if (translation is null) return NotFound();
         return Ok(translation);
     }

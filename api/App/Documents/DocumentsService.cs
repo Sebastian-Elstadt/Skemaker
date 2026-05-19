@@ -36,13 +36,7 @@ public class DocumentsService(
     public async Task<IEnumerable<DocumentItem>> GetAllDocumentsAsync(CancellationToken ct = default)
     {
         var docs = await recordStore.DocumentRepository.GetAllAsync(ct);
-        return docs.Select(d => new DocumentItem(
-            d.Id,
-            d.CreatedOn,
-            d.FileName,
-            d.FileHash,
-            d.SizeBytes
-        ));
+        return docs.Select(DocumentItem.FromDocument);
     }
 
     public async Task<DocumentFile?> GetDocumentFileAsync(Guid id, CancellationToken ct = default)

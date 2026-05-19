@@ -6,6 +6,7 @@ public record AnalysisTranslationItem<TTranslation>(
     Guid Id,
     DateTime CreatedOn,
     Guid AnalysisId,
+    AnalysisTranslationTarget Target,
     TTranslation Translation
 )
 {
@@ -14,6 +15,7 @@ public record AnalysisTranslationItem<TTranslation>(
             translation.Id,
             translation.CreatedOn,
             translation.AnalysisId,
+            translation.Target,
             translation.Translation
         );
 }

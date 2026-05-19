@@ -11,16 +11,16 @@ public class AnalysisTranslationService(
 {
     public async Task<IEnumerable<AnalysisTranslationListItem>> GetByAnalysisIdAsync(Guid analysisId, CancellationToken ct = default)
     {
-        var list = await recordStore.AnalysisTranslationRepository.GetByAnalysisIdAsync<GCodeTranslation>(analysisId, ct);
-        return list.Select(x => AnalysisTranslationListItem.FromAnalysisTranslation(x));
+        var list = await recordStore.AnalysisTranslationRepository.GetByAnalysisIdAsync<object>(analysisId, ct);
+        return list.Select(AnalysisTranslationListItem.FromAnalysisTranslation);
     }
 
-    public async Task<AnalysisTranslationItem<GCodeTranslation>?> GetByIdAsync(Guid translationId, CancellationToken ct = default)
+    public async Task<AnalysisTranslationItem<T>?> GetByIdAsync<T>(Guid translationId, CancellationToken ct = default)
     {
-        var translation = await recordStore.AnalysisTranslationRepository.GetByIdAsync<GCodeTranslation>(translationId, ct);
+        var translation = await recordStore.AnalysisTranslationRepository.GetByIdAsync<T>(translationId, ct);
         if (translation is null) return null;
         
-        return AnalysisTranslationItem<GCodeTranslation>.FromAnalysisTranslation(translation);
+        return AnalysisTranslationItem<T>.FromAnalysisTranslation(translation);
     }
 
     public async Task<AnalysisTranslationItem<GCodeTranslation>> TranslateToGCodeAsync(Guid analysisId, GCodeManufacturingOptions options, CancellationToken ct)
@@ -36,7 +36,7 @@ public class AnalysisTranslationService(
             // could be expanded to whatever else type of analyses may be made
         };
 
-        var translation = new AnalysisTranslation<GCodeTranslation>(analysisId, translationResult);
+        var translation = new AnalysisTranslation<GCodeTranslation>(analysisId, AnalysisTranslationTarget.GCode, translationResult);
         await recordStore.AnalysisTranslationRepository.AddAsync(translation, ct);
 
         return AnalysisTranslationItem<GCodeTranslation>.FromAnalysisTranslation(translation);

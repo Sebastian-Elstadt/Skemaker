@@ -8,7 +8,7 @@ public class DocumentAnalysisService(IRecordStore recordStore, IGdAndTAnalyzer g
     public async Task<IEnumerable<DocumentAnalysisListItem>> GetByDocumentIdAsync(Guid documentId, CancellationToken ct = default)
     {
         var list = await recordStore.DocumentAnalysisRepository.GetByDocumentIdAsync(documentId, ct);
-        return list.Select(x => new DocumentAnalysisListItem(x.Id, x.Type, x.CreatedOn));
+        return list.Select(DocumentAnalysisListItem.FromAnalysis);
     }
 
     public async Task<DocumentAnalysisItem?> GetByIdAsync(Guid id, CancellationToken ct = default)
@@ -16,7 +16,7 @@ public class DocumentAnalysisService(IRecordStore recordStore, IGdAndTAnalyzer g
         var analysis = await recordStore.DocumentAnalysisRepository.GetByIdAsync(id, ct);
         if (analysis is null) return null;
 
-        return new(analysis.Id, analysis.CreatedOn, analysis.Type, analysis.AnalysisJson);
+        return DocumentAnalysisItem.FromAnalysis(analysis);
     }
 
     public async Task<DocumentAnalysisItem> RunGdAndTAnalysisAsync(Guid documentId, CancellationToken ct = default)
@@ -28,6 +28,6 @@ public class DocumentAnalysisService(IRecordStore recordStore, IGdAndTAnalyzer g
         var analysis = new DocumentAnalysis(doc.Id, DocumentAnalysisType.GdAndT, analysisJson);
         await recordStore.DocumentAnalysisRepository.AddAsync(analysis, ct);
 
-        return new(analysis.Id, analysis.CreatedOn, analysis.Type, analysisJson);
+        return DocumentAnalysisItem.FromAnalysis(analysis);
     }
 }
