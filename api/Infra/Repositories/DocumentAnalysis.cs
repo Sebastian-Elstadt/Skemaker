@@ -14,9 +14,9 @@ public class DocumentAnalysisRepository(IQueryExecutor executor) : IDocumentAnal
         (string)row.analysis_json
     );
 
-    public async Task AddAsync(DocumentAnalysis analysis, CancellationToken ct = default)
+    public Task AddAsync(DocumentAnalysis analysis, CancellationToken ct = default)
     {
-        await executor.ExecuteAsync(
+        return executor.ExecuteAsync(
             """
             INSERT INTO document_analyses (id, created_on, document_id, type, analysis_json)
             VALUES (@Id, @CreatedOn, @DocumentId, @Type, @AnalysisJson);
@@ -29,6 +29,26 @@ public class DocumentAnalysisRepository(IQueryExecutor executor) : IDocumentAnal
                 Type = (short)analysis.Type,
                 analysis.AnalysisJson
             },
+            ct
+        );
+    }
+
+    public Task<DocumentAnalysis?> GetByIdAsync(Guid id, CancellationToken ct = default)
+    {
+        return executor.QuerySingleAsync(
+            "SELECT * FROM document_analyses WHERE id = @id",
+            new { id },
+            MapRow,
+            ct
+        );
+    }
+
+    public Task<IEnumerable<DocumentAnalysis>> GetByDocumentIdAsync(Guid documentId, CancellationToken ct = default)
+    {
+        return executor.QueryAsync(
+            "SELECT * FROM document_analyses WHERE document_id = @documentId",
+            new { documentId },
+            MapRow,
             ct
         );
     }

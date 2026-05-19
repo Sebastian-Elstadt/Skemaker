@@ -2,9 +2,8 @@ using Domain.Documents;
 
 namespace App.Documents;
 
-public record DocumentAnalysisItem(
+public record DocumentAnalysisListItem(
     Guid AnalysisId,
-    DateTime CreatedOn,
     DocumentAnalysisType AnalysisType,
-    string AnalysisJson
+    DateTime CreatedOn
 );

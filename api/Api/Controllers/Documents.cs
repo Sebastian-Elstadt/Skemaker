@@ -23,7 +23,7 @@ public class DocumentsController(IDocumentsService documents) : ControllerBase
     }
 
     [HttpGet("{docId:Guid}/file")]
-    public async Task<IActionResult> GetDocumentFileAsync([FromRoute] Guid docId)
+    public async Task<IActionResult> GetDocumentFileByIdAsync([FromRoute] Guid docId)
     {
         var docFile = await documents.GetDocumentFileAsync(docId, HttpContext.RequestAborted);
         if (docFile is null) return NotFound();

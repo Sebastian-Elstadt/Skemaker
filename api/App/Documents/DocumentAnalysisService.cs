@@ -5,15 +5,29 @@ namespace App.Documents;
 
 public class DocumentAnalysisService(IRecordStore recordStore, IGdAndTAnalyzer gdAndTAnalyzer) : IDocumentAnalysisService
 {
-    public async Task<DocumentAnalysisItem> RunGdAndTAnalysisAsync(Guid id, CancellationToken ct = default)
+    public async Task<IEnumerable<DocumentAnalysisListItem>> GetByDocumentIdAsync(Guid documentId, CancellationToken ct = default)
     {
-        var doc = await recordStore.DocumentRepository.GetByIdAsync(id, ct);
-        if (doc is null) throw new ArgumentException($"Document with ID {id} not found.");
+        var list = await recordStore.DocumentAnalysisRepository.GetByDocumentIdAsync(documentId, ct);
+        return list.Select(x => new DocumentAnalysisListItem(x.Id, x.Type, x.CreatedOn));
+    }
+
+    public async Task<DocumentAnalysisItem?> GetByIdAsync(Guid id, CancellationToken ct = default)
+    {
+        var analysis = await recordStore.DocumentAnalysisRepository.GetByIdAsync(id, ct);
+        if (analysis is null) return null;
+
+        return new(analysis.Id, analysis.CreatedOn, analysis.Type, analysis.AnalysisJson);
+    }
+
+    public async Task<DocumentAnalysisItem> RunGdAndTAnalysisAsync(Guid documentId, CancellationToken ct = default)
+    {
+        var doc = await recordStore.DocumentRepository.GetByIdAsync(documentId, ct);
+        if (doc is null) throw new ArgumentException($"Document with ID {documentId} not found.");
 
         var analysisJson = await gdAndTAnalyzer.AnalyzeDocumentAsync(doc, ct);
         var analysis = new DocumentAnalysis(doc.Id, DocumentAnalysisType.GdAndT, analysisJson);
         await recordStore.DocumentAnalysisRepository.AddAsync(analysis, ct);
 
-        return new(analysis.Id, analysis.Type, analysisJson);
+        return new(analysis.Id, analysis.CreatedOn, analysis.Type, analysisJson);
     }
 }
