@@ -60,19 +60,29 @@ public class xAiGdAndTAnalyzer(
             Content = JsonContent.Create(new
             {
                 model = "grok-4.20-0309-reasoning",
-                max_output_tokens = 8000,
+                max_output_tokens = 12000,
                 stream = true,
                 input = new object[] {
                     new {
                         role = "system",
-                        content = "You are an expert mechanical engineer specialized in reading technical drawings and GD&T per ASME Y14.5."
+                        content = "You are an expert mechanical engineer and GD&T specialist per ASME Y14.5. Extract all information from the attached technical drawing."
                     },
                     new {
                         role = "user",
                         content = new object[] {
                             new {
                                 type = "input_text",
-                                text = "Extract all information from the attached technical drawing according to the provided schema."
+                                text = @"Extract ALL technical information from the attached technical drawing. 
+Focus on spatial relationships and feature locations.
+
+Output ONLY valid JSON that strictly follows the provided schema. 
+Do not add any extra text outside the JSON object.
+
+Pay special attention to:
+- Exact positions of holes, slots, and features (use coordinates relative to datums if possible)
+- Basic dimensions and their relationships
+- Which features are controlled by which GD&T callouts
+- Whether this part is suitable for milling or better suited for other processes (e.g. laser cutting, waterjet)"
                             },
                             new {
                                 type = "input_file",
@@ -93,49 +103,60 @@ public class xAiGdAndTAnalyzer(
                             type = "object",
                             properties = new
                             {
-                                part_name = new
-                                {
-                                    type = "string"
-                                },
-                                part_number = new
-                                {
-                                    type = "string"
-                                },
-                                material = new
-                                {
-                                    type = "string"
-                                },
+                                part_name = new { type = "string" },
+                                part_number = new { type = "string" },
+                                material = new { type = "string" },
+
                                 overall_dimensions = new
                                 {
                                     type = "object",
                                     properties = new
                                     {
-                                        length = new
-                                        {
-                                            type = "number"
-                                        },
-                                        width = new
-                                        {
-                                            type = "number"
-                                        },
-                                        height = new
-                                        {
-                                            type = "number"
-                                        },
-                                        unit = new
-                                        {
-                                            type = "string",
-                                            @enum = new string[]{ "mm", "inch"
-                                                    }
-                                        }
+                                        length = new { type = "number" },
+                                        width = new { type = "number" },
+                                        height = new { type = "number" },
+                                        unit = new { type = "string", @enum = new[] { "mm", "inch" } }
                                     },
-                                    required = new string[] {
-                                                    "length",
-                                                    "width",
-                                                    "height",
-                                                    "unit"
-                                                }
+                                    required = new[] { "length", "width", "height", "unit" }
                                 },
+
+                                features = new
+                                {
+                                    type = "array",
+                                    items = new
+                                    {
+                                        type = "object",
+                                        properties = new
+                                        {
+                                            feature_id = new { type = "string" },
+                                            type = new { type = "string", @enum = new[] { "hole", "slot", "circle", "rectangle", "profile", "boss", "pocket", "other" } },
+                                            description = new { type = "string" },
+                                            nominal_diameter = new { type = "number" },
+                                            nominal_width = new { type = "number" },
+                                            nominal_length = new { type = "number" },
+                                            position = new
+                                            {
+                                                type = "object",
+                                                properties = new
+                                                {
+                                                    x = new { type = "number" },
+                                                    y = new { type = "number" },
+                                                    z = new { type = "number" },
+                                                    coordinate_system = new { type = "string" }
+                                                },
+                                                required = new[] { "x", "y" }
+                                            },
+                                            tolerance = new { type = "string" },
+                                            gdandt_references = new
+                                            {
+                                                type = "array",
+                                                items = new { type = "string" }
+                                            }
+                                        },
+                                        required = new[] { "feature_id", "type", "description", "position" }
+                                    }
+                                },
+
                                 dimensions = new
                                 {
                                     type = "array",
@@ -144,39 +165,17 @@ public class xAiGdAndTAnalyzer(
                                         type = "object",
                                         properties = new
                                         {
-                                            description = new
-                                            {
-                                                type = "string"
-                                            },
-                                            nominal = new
-                                            {
-                                                type = "number"
-                                            },
-                                            tolerance = new
-                                            {
-                                                type = "string"
-                                            },
-                                            upper = new
-                                            {
-                                                type = "number"
-                                            },
-                                            lower = new
-                                            {
-                                                type = "number"
-                                            },
-                                            unit = new
-                                            {
-                                                type = "string"
-                                            }
+                                            description = new { type = "string" },
+                                            nominal = new { type = "number" },
+                                            tolerance = new { type = "string" },
+                                            upper = new { type = "number" },
+                                            lower = new { type = "number" },
+                                            unit = new { type = "string" }
                                         },
-                                        required = new string[]
-                                        {
-                                            "description",
-                                            "nominal",
-                                            "unit"
-                                        }
+                                        required = new[] { "description", "nominal", "unit" }
                                     }
                                 },
+
                                 gdandt = new
                                 {
                                     type = "array",
@@ -185,39 +184,18 @@ public class xAiGdAndTAnalyzer(
                                         type = "object",
                                         properties = new
                                         {
-                                            feature = new
-                                            {
-                                                type = "string"
-                                            },
-                                            symbol = new
-                                            {
-                                                type = "string"
-                                            },
-                                            tolerance_value = new
-                                            {
-                                                type = "string"
-                                            },
-                                            datums = new
-                                            {
-                                                type = "string"
-                                            },
-                                            modifiers = new
-                                            {
-                                                type = "string"
-                                            },
-                                            description = new
-                                            {
-                                                type = "string"
-                                            }
+                                            feature = new { type = "string" },
+                                            symbol = new { type = "string" },
+                                            tolerance_value = new { type = "string" },
+                                            datums = new { type = "string" },
+                                            modifiers = new { type = "string" },
+                                            description = new { type = "string" },
+                                            affected_features = new { type = "array", items = new { type = "string" } }
                                         },
-                                        required = new string[]
-                                                    {
-                                                        "feature",
-                                                        "symbol",
-                                                        "tolerance_value"
-                                                    }
+                                        required = new[] { "feature", "symbol", "tolerance_value", "datums" }
                                     }
                                 },
+
                                 datums = new
                                 {
                                     type = "array",
@@ -226,34 +204,24 @@ public class xAiGdAndTAnalyzer(
                                         type = "object",
                                         properties = new
                                         {
-                                            letter = new
-                                            {
-                                                type = "string"
-                                            },
-                                            description = new
-                                            {
-                                                type = "string"
-                                            }
+                                            letter = new { type = "string" },
+                                            description = new { type = "string" },
+                                            type = new { type = "string" }
                                         },
-                                        required = new string[] { "letter" }
+                                        required = new[] { "letter", "description" }
                                     }
                                 },
+
                                 notes = new
                                 {
                                     type = "array",
-                                    items = new
-                                    {
-                                        type = "string"
-                                    }
+                                    items = new { type = "string" }
                                 },
-                                surface_finish = new
-                                {
-                                    type = "string"
-                                },
-                                general_tolerances = new
-                                {
-                                    type = "string"
-                                },
+
+                                surface_finish = new { type = "string" },
+                                general_tolerances = new { type = "string" },
+                                recommended_manufacturing_method = new { type = "string" },
+
                                 confidence = new
                                 {
                                     type = "number",
@@ -261,16 +229,10 @@ public class xAiGdAndTAnalyzer(
                                     maximum = 1
                                 }
                             },
-                            required = new string[]
+                            required = new[]
                             {
-                                "part_name",
-                                "material",
-                                "overall_dimensions",
-                                "dimensions",
-                                "gdandt",
-                                "datums",
-                                "notes",
-                                "confidence"
+                                "part_name", "material", "overall_dimensions", "features",
+                                "dimensions", "gdandt", "datums", "notes", "confidence"
                             },
                             additionalProperties = false
                         }

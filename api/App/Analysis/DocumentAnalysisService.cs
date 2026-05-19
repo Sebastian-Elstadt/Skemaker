@@ -1,7 +1,7 @@
 using App.Abstractions;
 using Domain.Documents;
 
-namespace App.Documents;
+namespace App.Analysis;
 
 public class DocumentAnalysisService(IRecordStore recordStore, IGdAndTAnalyzer gdAndTAnalyzer) : IDocumentAnalysisService
 {

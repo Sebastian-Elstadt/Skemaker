@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace App.Documents;
+namespace App.Analysis;
 
 public record DocumentGdAndTAnalysis
 {
@@ -15,6 +15,9 @@ public record DocumentGdAndTAnalysis
 
     [JsonPropertyName("overall_dimensions")]
     public required OverallDimensions OverallDimensions { get; init; }
+
+    [JsonPropertyName("features")]
+    public required List<FeatureEntry> Features { get; init; }
 
     [JsonPropertyName("dimensions")]
     public required List<DimensionEntry> Dimensions { get; init; }
@@ -34,6 +37,9 @@ public record DocumentGdAndTAnalysis
     [JsonPropertyName("general_tolerances")]
     public string? GeneralTolerances { get; init; }
 
+    [JsonPropertyName("recommended_manufacturing_method")]
+    public string? RecommendedManufacturingMethod { get; init; }
+
     [JsonPropertyName("confidence")]
     public required double Confidence { get; init; }
 }
@@ -51,6 +57,51 @@ public record OverallDimensions
 
     [JsonPropertyName("unit")]
     public required string Unit { get; init; }
+}
+
+public record FeatureEntry
+{
+    [JsonPropertyName("feature_id")]
+    public required string FeatureId { get; init; }
+
+    [JsonPropertyName("type")]
+    public required string Type { get; init; }
+
+    [JsonPropertyName("description")]
+    public required string Description { get; init; }
+
+    [JsonPropertyName("nominal_diameter")]
+    public double? NominalDiameter { get; init; }
+
+    [JsonPropertyName("nominal_width")]
+    public double? NominalWidth { get; init; }
+
+    [JsonPropertyName("nominal_length")]
+    public double? NominalLength { get; init; }
+
+    [JsonPropertyName("position")]
+    public required FeaturePosition Position { get; init; }
+
+    [JsonPropertyName("tolerance")]
+    public string? Tolerance { get; init; }
+
+    [JsonPropertyName("gdandt_references")]
+    public List<string>? GdAndTReferences { get; init; }
+}
+
+public record FeaturePosition
+{
+    [JsonPropertyName("x")]
+    public required double X { get; init; }
+
+    [JsonPropertyName("y")]
+    public required double Y { get; init; }
+
+    [JsonPropertyName("z")]
+    public double? Z { get; init; }
+
+    [JsonPropertyName("coordinate_system")]
+    public string? CoordinateSystem { get; init; }
 }
 
 public record DimensionEntry
@@ -86,13 +137,16 @@ public record GdAndTEntry
     public required string ToleranceValue { get; init; }
 
     [JsonPropertyName("datums")]
-    public string? Datums { get; init; }
+    public required string Datums { get; init; }
 
     [JsonPropertyName("modifiers")]
     public string? Modifiers { get; init; }
 
     [JsonPropertyName("description")]
     public string? Description { get; init; }
+
+    [JsonPropertyName("affected_features")]
+    public List<string>? AffectedFeatures { get; init; }
 }
 
 public record DatumEntry
@@ -101,5 +155,8 @@ public record DatumEntry
     public required string Letter { get; init; }
 
     [JsonPropertyName("description")]
-    public string? Description { get; init; }
+    public required string Description { get; init; }
+
+    [JsonPropertyName("type")]
+    public string? Type { get; init; }
 }

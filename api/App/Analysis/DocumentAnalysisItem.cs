@@ -1,6 +1,6 @@
 using Domain.Documents;
 
-namespace App.Documents;
+namespace App.Analysis;
 
 public record DocumentAnalysisItem(
     Guid AnalysisId,
