@@ -6,8 +6,7 @@ namespace App.Documents;
 
 public class DocumentsService(
     IFileStore fileStore, 
-    IRecordStore recordStore,
-    IGdAndTAnalyzer gdAndTAnalyzer
+    IRecordStore recordStore
 ) : IDocumentsService
 {
     private const string DocumentsDirName = "documents";
@@ -53,18 +52,6 @@ public class DocumentsService(
 
         var stream = fileStore.OpenReadStream(doc.FilePath);
         return new(stream, doc.FileName, doc.ContentType);
-    }
-
-    public async Task<string> RunDocumentGdAndTAnalysisAsync(Guid id, CancellationToken ct = default)
-    {
-        var doc = await recordStore.DocumentRepository.GetByIdAsync(id, ct);
-        if (doc is null) throw new ArgumentException($"Document with ID {id} not found.");
-
-        var analysisJson = await gdAndTAnalyzer.AnalyzeDocumentAsync(doc, ct);
-        var analysis = new DocumentAnalysis(doc.Id, DocumentAnalysisType.GdAndT, analysisJson);
-        await recordStore.DocumentAnalysisRepository.AddAsync(analysis, ct);
-
-        return analysisJson;
     }
 
     private static string NormalizeContentType(string? contentType)

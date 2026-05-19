@@ -19,7 +19,7 @@ public class xAiGdAndTAnalyzer(
 
         using var form = new MultipartFormDataContent();
         using var fileContent = new StreamContent(fileStream);
-        fileContent.Headers.ContentType = new MediaTypeHeaderValue(doc.ContentType ?? "application/octet-stream");
+        fileContent.Headers.ContentType = new MediaTypeHeaderValue(doc.ContentType);
 
         form.Add(fileContent, "file", doc.FileName);
         form.Add(new StringContent("assistants"), "purpose");

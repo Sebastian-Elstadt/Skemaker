@@ -28,6 +28,8 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<IFileStore, VolumeFileStore>(sp => new VolumeFileStore(fileStoreConfig));
         services.AddScoped<IRecordStore, PostgresRecordStore>(sp => new PostgresRecordStore(recordStoreConfig));
+
+        services.AddScoped<xAiUploadStore>();
         services.AddHttpClient<IGdAndTAnalyzer, xAiGdAndTAnalyzer>(client =>
         {
             client.BaseAddress = new Uri(xAiConfig.BaseUrl);
