@@ -5,10 +5,24 @@ using Domain.Translation;
 namespace App.Translation;
 
 public class AnalysisTranslationService(
-    IRecordStore recordStore, 
+    IRecordStore recordStore,
     IGdAndTAnalysisToGCodeTranslator gdAndTAnalysisToGCodeTranslator
 ) : IAnalysisTranslationService
 {
+    public async Task<IEnumerable<AnalysisTranslationListItem>> GetByAnalysisIdAsync(Guid analysisId, CancellationToken ct = default)
+    {
+        var list = await recordStore.AnalysisTranslationRepository.GetByAnalysisIdAsync<GCodeTranslation>(analysisId, ct);
+        return list.Select(x => AnalysisTranslationListItem.FromAnalysisTranslation(x));
+    }
+
+    public async Task<AnalysisTranslationItem<GCodeTranslation>?> GetByIdAsync(Guid translationId, CancellationToken ct = default)
+    {
+        var translation = await recordStore.AnalysisTranslationRepository.GetByIdAsync<GCodeTranslation>(translationId, ct);
+        if (translation is null) return null;
+        
+        return AnalysisTranslationItem<GCodeTranslation>.FromAnalysisTranslation(translation);
+    }
+
     public async Task<AnalysisTranslationItem<GCodeTranslation>> TranslateToGCodeAsync(Guid analysisId, GCodeManufacturingOptions options, CancellationToken ct)
     {
         var analysis = await recordStore.DocumentAnalysisRepository.GetByIdAsync(analysisId, ct);
@@ -24,7 +38,7 @@ public class AnalysisTranslationService(
 
         var translation = new AnalysisTranslation<GCodeTranslation>(analysisId, translationResult);
         await recordStore.AnalysisTranslationRepository.AddAsync(translation, ct);
-        
+
         return AnalysisTranslationItem<GCodeTranslation>.FromAnalysisTranslation(translation);
     }
 }

@@ -6,7 +6,7 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("translation")]
-public class TranslationController(IAnalysisTranslationService analysisTranslationService) : ControllerBase
+public class TranslationController(IAnalysisTranslationService translationService) : ControllerBase
 {
     [HttpPost("gCode")]
     public async Task<IActionResult> TranslateToGCodeAsync(
@@ -14,7 +14,22 @@ public class TranslationController(IAnalysisTranslationService analysisTranslati
         [FromBody] TranslateToGCodeRequest req
     )
     {
-        var result = await analysisTranslationService.TranslateToGCodeAsync(analysisId, req.ToGCodeManufacturingOptions(), HttpContext.RequestAborted);
+        var result = await translationService.TranslateToGCodeAsync(analysisId, req.ToGCodeManufacturingOptions(), HttpContext.RequestAborted);
         return Ok(result);
+    }
+
+    [HttpGet("by-analysis/{analysisId:Guid}")]
+    public async Task<IActionResult> GetByAnalysisIdAsync([FromRoute] Guid analysisId)
+    {
+        var list = await translationService.GetByAnalysisIdAsync(analysisId, HttpContext.RequestAborted);
+        return Ok(list);
+    }
+
+    [HttpGet("{translationId:Guid}")]
+    public async Task<IActionResult> GetByIdAsync([FromRoute] Guid translationId)
+    {
+        var translation = await translationService.GetByIdAsync(translationId, HttpContext.RequestAborted);
+        if (translation is null) return NotFound();
+        return Ok(translation);
     }
 }
