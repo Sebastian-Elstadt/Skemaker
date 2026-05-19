@@ -1,4 +1,4 @@
-using Domain.Documents;
+using Domain.Analysis;
 
 namespace App.Abstractions;
 

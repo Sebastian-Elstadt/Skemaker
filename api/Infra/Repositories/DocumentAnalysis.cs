@@ -1,5 +1,5 @@
 using App.Abstractions;
-using Domain.Documents;
+using Domain.Analysis;
 using Infra.Abstractions;
 
 namespace Infra.Repositories;

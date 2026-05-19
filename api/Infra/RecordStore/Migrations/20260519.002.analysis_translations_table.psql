@@ -1,0 +1,8 @@
+CREATE TABLE analysis_translations (
+    id               UUID NOT NULL DEFAULT gen_random_uuid(),
+    created_on       TIMESTAMPTZ NOT NULL DEFAULT now(),
+    analysis_id      UUID NOT NULL REFERENCES document_analyses(id) ON DELETE CASCADE,
+    translation_json JSONB NOT NULL,
+
+    CONSTRAINT pk_analysis_translations PRIMARY KEY (id)
+);

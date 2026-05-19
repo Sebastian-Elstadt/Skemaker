@@ -1,4 +1,4 @@
-namespace Domain.Documents;
+namespace Domain.Analysis;
 
 public class DocumentAnalysis
 {

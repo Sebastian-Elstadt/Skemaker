@@ -1,4 +1,4 @@
-namespace Domain.Documents;
+namespace Domain.Analysis;
 
 public enum DocumentAnalysisType : short
 {

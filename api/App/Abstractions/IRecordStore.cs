@@ -8,4 +8,5 @@ public interface IRecordStore
 
     IDocumentRepository DocumentRepository { get; }
     IDocumentAnalysisRepository DocumentAnalysisRepository { get; }
+    IAnalysisTranslationRepository AnalysisTranslationRepository { get; }
 }

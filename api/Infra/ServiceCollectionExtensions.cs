@@ -4,6 +4,8 @@ using Infra.Abstractions;
 using Infra.Analysis;
 using Infra.FileStorage;
 using Infra.RecordStore;
+using Infra.Translation;
+using Infra.xAI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -34,12 +36,14 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IQueryExecutor>(sp => sp.GetRequiredService<PostgresRecordStore>()); // for infra-internal exposure
 
         services.AddScoped<xAiUploadStore>();
-        services.AddHttpClient<IGdAndTAnalyzer, xAiGdAndTAnalyzer>(client =>
+        services.AddHttpClient<xAiClient>(client =>
         {
             client.BaseAddress = new Uri(xAiConfig.BaseUrl);
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", xAiConfig.ApiKey);
             client.Timeout = TimeSpan.FromMinutes(10);
         });
+        services.AddScoped<IGdAndTAnalyzer, xAiGdAndTAnalyzer>();
+        services.AddScoped<IGdAndTAnalysisToGCodeTranslator, xAiGdAndTAnalysisToGCodeTranslator>();
 
         return services;
     }

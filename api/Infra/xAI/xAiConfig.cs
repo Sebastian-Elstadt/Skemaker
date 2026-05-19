@@ -1,4 +1,4 @@
-namespace Infra.Analysis;
+namespace Infra.xAI;
 
 public record xAiConfig(
     string BaseUrl,

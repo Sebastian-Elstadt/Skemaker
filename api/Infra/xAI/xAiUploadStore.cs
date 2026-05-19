@@ -1,6 +1,6 @@
 using Infra.Abstractions;
 
-namespace Infra.Analysis;
+namespace Infra.xAI;
 
 public class xAiUploadStore(IQueryExecutor executor)
 {
