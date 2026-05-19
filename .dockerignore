@@ -5,3 +5,5 @@
 .vscode
 .vs
 **/.dockerignore
+demo/
+**/*.local
