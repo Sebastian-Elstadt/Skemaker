@@ -36,17 +36,18 @@ public class xAiGdAndTAnalyzer(
                     content = new object[] {
                         new {
                             type = "input_text",
-                            text = @"Extract ALL technical information from the attached technical drawing. 
-Focus on spatial relationships and feature locations.
+                            text = """
+                            Extract ALL technical information from the attached technical drawing into the exact JSON schema.
 
-Output ONLY valid JSON that strictly follows the provided schema. 
-Do not add any extra text outside the JSON object.
+                            CRITICAL REQUIREMENTS:
+                            - For every feature (hole, slot, circle, rectangle, etc.), provide accurate X/Y coordinates relative to the primary datums (usually A|B|C).
+                            - If the drawing shows basic dimensions or coordinate callouts, calculate and include the real position values.
+                            - Pay special attention to datum references and feature relationships.
+                            - Set recommended_manufacturing_method correctly (e.g., 'laser-cut contour', 'mill', 'waterjet', etc.).
+                            - Be precise — the downstream G-code generator will ONLY use the coordinates you provide.
 
-Pay special attention to:
-- Exact positions of holes, slots, and features (use coordinates relative to datums if possible)
-- Basic dimensions and their relationships
-- Which features are controlled by which GD&T callouts
-- Whether this part is suitable for milling or better suited for other processes (e.g. laser cutting, waterjet)"
+                            Output ONLY valid JSON matching the schema. No extra text.
+                            """
                         },
                         new {
                             type = "input_file",
@@ -113,9 +114,23 @@ Pay special attention to:
                                     {
                                         type = "array",
                                         items = new { type = "string" }
+                                    },
+                                    basic_dimensions = new
+                                    {
+                                        type = "array",
+                                        items = new
+                                        {
+                                            type = "object",
+                                            properties = new
+                                            {
+                                                description = new { type = "string" },
+                                                value = new { type = "number" },
+                                                from_datum = new { type = "string" }
+                                            }
+                                        }
                                     }
                                 },
-                                required = new[] { "feature_id", "type", "description", "position" }
+                                required = new[] { "feature_id", "type", "description", "position", "basic_dimensions" }
                             }
                         },
 

@@ -87,6 +87,19 @@ public record FeatureEntry
 
     [JsonPropertyName("gdandt_references")]
     public List<string>? GdAndTReferences { get; init; }
+
+    [JsonPropertyName("basic_dimensions")]
+    public List<BasicDimension>? BasicDimensions { get; init; }
+}
+
+public record BasicDimension
+{
+    [JsonPropertyName("description")]
+    public required string Description { get; init; }
+    [JsonPropertyName("value")]
+    public required double Value { get; init; }
+    [JsonPropertyName("from_datum")]
+    public required string FromDatum { get; init; }
 }
 
 public record FeaturePosition

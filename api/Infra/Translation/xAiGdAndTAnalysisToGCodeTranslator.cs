@@ -38,7 +38,7 @@ public class xAiGdAndTAnalysisToGCodeTranslator(
                         new {
                             type = "input_text",
                             text = $"""
-                            Part specification from drawing analysis:
+                            Part specification (JSON from analyzer):
                             {PrettyPrintJson(analysis.AnalysisJson)}
 
                             Manufacturing configuration:
@@ -46,18 +46,19 @@ public class xAiGdAndTAnalysisToGCodeTranslator(
 
                             Original drawing file_id (for visual reference): {xAiFileId}
 
-                            Generate a complete G-code program that:
-                            - Uses only the tools listed above
-                            - Respects all GD&T tolerances where practically possible
-                            - Includes roughing and finishing passes where appropriate
-                            - Uses proper feeds & speeds for the material
-                            - Has safe retracts at the specified SafeZHeight
-                            - Uses the requested work offset
+                            CRITICAL RULES — YOU MUST FOLLOW THESE EXACTLY:
+                            - Use ONLY the exact X/Y positions from the "features" array in the JSON. Never invent or approximate coordinates.
+                            - Respect the actual material thickness (see overall_dimensions.height). Never cut deeper than 110% of part thickness.
+                            - For holes: use proper helical ramping or canned cycles (G81/G83). Do not use degenerate arcs.
+                            - Output COMPLETE, ready-to-run G-code. No comments like "(REPEAT FOR OTHER...)" — write every line.
+                            - Respect all GD&T where practical, but prioritize safe, manufacturable code.
+                            - Use only the tools provided in the configuration.
+                            - Feeds & speeds must be appropriate for the material and tool.
 
-                            Output **strictly** following the JSON schema.
-                            - strategySummary: Brief manufacturing strategy and notes
-                            - toolList: Markdown list of tools used with parameters
-                            - gcode: The complete, clean G-code block only (no markdown outside the string)
+                            Output **strictly** as JSON following the schema:
+                            - strategySummary: 2-3 sentence manufacturing strategy + any important notes
+                            - toolList: Markdown list of tools actually used
+                            - gcode: The COMPLETE, clean G-code block ONLY (no extra text, no markdown)
                             """
                             // Output format:
                             // 1. Brief Strategy Summary
