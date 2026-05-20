@@ -22,8 +22,8 @@ export class TranslationDetailPage implements OnInit {
   error = signal<string | null>(null);
   showStrategy = signal(true);
 
-  gcodeText = computed(() => this.translation()?.translation.gCode ?? '');
-  strategySummary = computed(() => this.translation()?.translation.strategySummary ?? '');
+  gcodeText = computed(() => this.translation()?.Translation.GCode ?? '');
+  strategySummary = computed(() => this.translation()?.Translation.StrategySummary ?? '');
   lineCount = computed(() => this.gcodeText().split('\n').length);
 
   ngOnInit(): void {

@@ -50,9 +50,9 @@ export class AnalysisDetailPage implements OnInit {
 
   parsed = computed<GdAndTAnalysis | null>(() => {
     const a = this.analysis();
-    if (!a?.analysisJson) return null;
+    if (!a?.AnalysisJson) return null;
     try {
-      return JSON.parse(a.analysisJson) as GdAndTAnalysis;
+      return JSON.parse(a.AnalysisJson) as GdAndTAnalysis;
     } catch {
       return null;
     }
@@ -60,7 +60,7 @@ export class AnalysisDetailPage implements OnInit {
 
   prettyJson = computed(() => {
     const p = this.parsed();
-    return p ? JSON.stringify(p, null, 2) : (this.analysis()?.analysisJson ?? '');
+    return p ? JSON.stringify(p, null, 2) : (this.analysis()?.AnalysisJson ?? '');
   });
 
   form: TranslateForm = {
@@ -106,7 +106,7 @@ export class AnalysisDetailPage implements OnInit {
     this.loadingTranslations.set(true);
     this.translationApi.listByAnalysisId(this.id).subscribe({
       next: list => {
-        this.translations.set([...list].sort((a, b) => b.createdOn.localeCompare(a.createdOn)));
+        this.translations.set([...list].sort((a, b) => b.CreatedOn.localeCompare(a.CreatedOn)));
         this.loadingTranslations.set(false);
       },
       error: err => {
@@ -132,22 +132,22 @@ export class AnalysisDetailPage implements OnInit {
   submit(): void {
     if (!this.analysis()) return;
     const req: TranslateToGCodeRequest = {
-      analysisId: this.id,
-      machineType: this.form.machineType,
-      material: this.form.material || undefined,
-      stockSize: { x: this.form.stockX, y: this.form.stockY, z: this.form.stockZ, unit: this.form.stockUnit },
-      tools: [{
-        name: this.form.toolName,
-        diameter: this.form.toolDiameter,
-        flutes: this.form.toolFlutes,
-        material: this.form.toolMaterial
+      AnalysisId: this.id,
+      MachineType: this.form.machineType,
+      Material: this.form.material || undefined,
+      StockSize: { X: this.form.stockX, Y: this.form.stockY, Z: this.form.stockZ, Unit: this.form.stockUnit },
+      Tools: [{
+        Name: this.form.toolName,
+        Diameter: this.form.toolDiameter,
+        Flutes: this.form.toolFlutes,
+        Material: this.form.toolMaterial
       }],
-      workOffset: this.form.workOffset,
-      workOffsetLocation: this.form.workOffsetLocation,
-      operationStrategy: this.form.operationStrategy,
-      coolant: this.form.coolant,
-      safeZHeight: this.form.safeZHeight,
-      additionalNotes: this.form.additionalNotes || undefined
+      WorkOffset: this.form.workOffset,
+      WorkOffsetLocation: this.form.workOffsetLocation,
+      OperationStrategy: this.form.operationStrategy,
+      Coolant: this.form.coolant,
+      SafeZHeight: this.form.safeZHeight,
+      AdditionalNotes: this.form.additionalNotes || undefined
     };
 
     this.translating.set(true);
@@ -155,7 +155,7 @@ export class AnalysisDetailPage implements OnInit {
     this.translationApi.createGCode(req).subscribe({
       next: result => {
         this.translating.set(false);
-        this.router.navigate(['/translations', result.id]);
+        this.router.navigate(['/translations', result.Id]);
       },
       error: err => {
         this.translating.set(false);

@@ -11,6 +11,13 @@ public class xAiGdAndTAnalysisToGCodeTranslator(
     xAiUploadStore uploadStore
 ) : IGdAndTAnalysisToGCodeTranslator
 {
+    private record GCodeResponse
+    {
+        public string StrategySummary { get; set; } = string.Empty;
+        public string ToolList { get; set; } = string.Empty;
+        public string GCode { get; set; } = string.Empty;
+    }
+
     public async Task<GCodeTranslation> TranslateAsync(DocumentAnalysis analysis, GCodeManufacturingOptions options, CancellationToken ct = default)
     {
         if (analysis.Type != DocumentAnalysisType.GdAndT)
@@ -19,7 +26,7 @@ public class xAiGdAndTAnalysisToGCodeTranslator(
         string xAiFileId = await uploadStore.GetFileIdByDocumentIdAsync(analysis.DocumentId, ct)
             ?? throw new InvalidOperationException($"No xAI file ID found for document ID {analysis.DocumentId}. Cannot proceed with G-code translation without reference to original drawing.");
 
-        string result = await xAiClient.GenerateResponseAsync(
+        string responseString = await xAiClient.GenerateResponseAsync(
             inputs: [
                 new {
                     role = "system",
@@ -47,11 +54,15 @@ public class xAiGdAndTAnalysisToGCodeTranslator(
                             - Has safe retracts at the specified SafeZHeight
                             - Uses the requested work offset
 
-                            Output format:
-                            1. Brief Strategy Summary
-                            2. Tool List Used
-                            3. Full G-code with clear comments and section headers (G-code only in one block)
+                            Output **strictly** following the JSON schema.
+                            - strategySummary: Brief manufacturing strategy and notes
+                            - toolList: Markdown list of tools used with parameters
+                            - gcode: The complete, clean G-code block only (no markdown outside the string)
                             """
+                            // Output format:
+                            // 1. Brief Strategy Summary
+                            // 2. Tool List Used
+                            // 3. Full G-code with clear comments and section headers (G-code only in one block)
                         },
                         new {
                             type = "input_file",
@@ -60,22 +71,35 @@ public class xAiGdAndTAnalysisToGCodeTranslator(
                     }
                 }
             ],
+            formatOptions: new
+            {
+                type = "json_schema",
+                name = "gcode_generation",
+                strict = true,
+                schema = new
+                {
+                    type = "object",
+                    properties = new
+                    {
+                        strategySummary = new { type = "string" },
+                        toolList = new { type = "string" },
+                        gcode = new { type = "string" }
+                    },
+                    required = new[] { "strategySummary", "toolList", "gcode" },
+                    additionalProperties = false
+                }
+            },
             maxOutputTokens: 16000
         );
 
-        if (string.IsNullOrWhiteSpace(result))
+        if (string.IsNullOrWhiteSpace(responseString))
             throw new InvalidOperationException("Received empty response from xAI. Cannot proceed with G-code translation.");
 
-        int gCodeStart = result.IndexOf("G00", StringComparison.OrdinalIgnoreCase);
-        string summaryText = gCodeStart > 0
-            ? result.Substring(0, gCodeStart).Trim()
-            : result;
+        var parsed = JsonSerializer.Deserialize<GCodeResponse>(responseString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        if (parsed is null)
+            throw new InvalidOperationException("Failed to parse xAI response into expected GCodeResponse structure. Response content: " + responseString);
 
-        string gCodeText = gCodeStart > 0
-            ? result.Substring(gCodeStart).Trim()
-            : result;
-
-        return new(result, summaryText, gCodeText);
+        return new(responseString, parsed.StrategySummary, parsed.GCode, parsed.ToolList);
     }
 
     private string PrettyPrintJson(string minifiedJson)

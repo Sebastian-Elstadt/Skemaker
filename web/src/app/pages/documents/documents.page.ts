@@ -28,7 +28,7 @@ export class DocumentsPage implements OnInit {
     this.error.set(null);
     this.api.list().subscribe({
       next: docs => {
-        this.documents.set([...docs].sort((a, b) => b.createdOn.localeCompare(a.createdOn)));
+        this.documents.set([...docs].sort((a, b) => b.CreatedOn.localeCompare(a.CreatedOn)));
         this.loading.set(false);
       },
       error: err => {

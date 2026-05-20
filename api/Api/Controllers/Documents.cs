@@ -27,11 +27,11 @@ public class DocumentsController(IDocumentsService documents) : ControllerBase
     {
         var docFile = await documents.GetDocumentFileAsync(docId, HttpContext.RequestAborted);
         if (docFile is null) return NotFound();
-
+        
+        Response.Headers.ContentDisposition = $"inline; filename=\"{docFile.FileName}\"";
         return File(
             docFile.Stream,
             docFile.ContentType,
-            docFile.FileName,
             enableRangeProcessing: true
         );
     }

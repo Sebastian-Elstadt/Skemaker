@@ -6,7 +6,7 @@
     <h1>{{ parsed()?.part_name || 'Analysis' }}</h1>
     @if (analysis(); as a) {
       <div class="meta">
-        <span class="tag tag--accent">{{ analysisLabel(a.analysisType) }}</span>
+        <span class="tag tag--accent">{{ analysisLabel(a.AnalysisType) }}</span>
         @if (parsed()?.material; as m) {
           <span class="tag">{{ m }}</span>
         }
@@ -15,8 +15,8 @@
             confidence {{ (pp.confidence * 100).toFixed(0) }}%
           </span>
         }
-        <span class="mono faint">{{ a.analysisId }}</span>
-        <span class="mono muted">{{ formatDate(a.createdOn) }}</span>
+        <span class="mono faint">{{ a.AnalysisId }}</span>
+        <span class="mono muted">{{ formatDate(a.CreatedOn) }}</span>
       </div>
     }
   </div>
@@ -111,7 +111,7 @@
   <section class="surface-block analysis-block">
     <header class="block__head">
       <h4>EXTRACTED DATA</h4>
-      <span class="mono faint">{{ analysis()?.analysisJson?.length || 0 }} chars</span>
+      <span class="mono faint">{{ analysis()?.AnalysisJson?.length || 0 }} chars</span>
     </header>
 
     @if (parsed(); as p) {
@@ -175,7 +175,7 @@
     } @else if (loadingAnalysis()) {
       <p class="muted">Loading analysis…</p>
     } @else {
-      <pre class="raw">{{ analysis()?.analysisJson }}</pre>
+      <pre class="raw">{{ analysis()?.AnalysisJson }}</pre>
     }
   </section>
 
@@ -194,14 +194,14 @@
       </div>
     } @else {
       <ul class="t-list">
-        @for (t of translations(); track t.id) {
+        @for (t of translations(); track t.Id) {
           <li>
-            <a class="t-item" [routerLink]="['/translations', t.id]">
+            <a class="t-item" [routerLink]="['/translations', t.Id]">
               <span class="t-row">
-                <span class="tag tag--accent">{{ targetLabel(t.target) }}</span>
-                <span class="mono faint">{{ t.id }}</span>
+                <span class="tag tag--accent">{{ targetLabel(t.Target) }}</span>
+                <span class="mono faint">{{ t.Id }}</span>
               </span>
-              <span class="mono muted">{{ formatDate(t.createdOn) }}</span>
+              <span class="mono muted">{{ formatDate(t.CreatedOn) }}</span>
               <span class="arrow">&rarr;</span>
             </a>
           </li>

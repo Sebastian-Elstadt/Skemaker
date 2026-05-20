@@ -1,11 +1,11 @@
 export interface DocumentItem {
-  id: string;
-  createdOn: string;
-  fileName: string;
-  fileHash: string;
-  sizeBytes: number;
+  Id: string;
+  CreatedOn: string;
+  FileName: string;
+  FileHash: string;
+  SizeBytes: number;
 }
 
 export interface CreateDocumentResponse {
-  documentId: string;
+  DocumentId: string;
 }

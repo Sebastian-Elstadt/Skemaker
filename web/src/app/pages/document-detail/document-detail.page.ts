@@ -38,7 +38,7 @@ export class DocumentDetailPage implements OnInit {
     this.loadingDoc.set(true);
     this.documentsApi.list().subscribe({
       next: docs => {
-        this.document.set(docs.find(d => d.id === this.id) ?? null);
+        this.document.set(docs.find(d => d.Id === this.id) ?? null);
         this.loadingDoc.set(false);
       },
       error: err => {
@@ -52,7 +52,7 @@ export class DocumentDetailPage implements OnInit {
     this.loadingAnalyses.set(true);
     this.analysisApi.listByDocumentId(this.id).subscribe({
       next: list => {
-        this.analyses.set([...list].sort((a, b) => b.createdOn.localeCompare(a.createdOn)));
+        this.analyses.set([...list].sort((a, b) => b.CreatedOn.localeCompare(a.CreatedOn)));
         this.loadingAnalyses.set(false);
       },
       error: err => {
@@ -68,7 +68,7 @@ export class DocumentDetailPage implements OnInit {
     this.analysisApi.createGdAndT(this.id).subscribe({
       next: result => {
         this.running.set(false);
-        this.router.navigate(['/analyses', result.analysisId]);
+        this.router.navigate(['/analyses', result.AnalysisId]);
       },
       error: err => {
         this.running.set(false);

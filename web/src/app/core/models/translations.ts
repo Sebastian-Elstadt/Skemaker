@@ -1,43 +1,43 @@
 export type AnalysisTranslationTarget = 'GCode' | number;
 
 export interface AnalysisTranslationListItem {
-  id: string;
-  createdOn: string;
-  analysisId: string;
-  target: AnalysisTranslationTarget;
+  Id: string;
+  CreatedOn: string;
+  AnalysisId: string;
+  Target: AnalysisTranslationTarget;
 }
 
 export interface AnalysisTranslationItem<T = unknown> {
-  id: string;
-  createdOn: string;
-  analysisId: string;
-  target: AnalysisTranslationTarget;
-  translation: T;
+  Id: string;
+  CreatedOn: string;
+  AnalysisId: string;
+  Target: AnalysisTranslationTarget;
+  Translation: T;
 }
 
 export interface GCodeTranslation {
-  fullResult: string;
-  strategySummary: string;
-  gCode: string;
+  FullResult: string;
+  StrategySummary: string;
+  GCode: string;
 }
 
 export interface TranslateToGCodeRequest {
-  analysisId: string;
-  machineType: string;
-  material?: string;
-  stockSize: { x: number; y: number; z: number; unit: string };
-  tools: ToolDefinition[];
-  workOffset: string;
-  workOffsetLocation: string;
-  operationStrategy: string;
-  coolant: string;
-  safeZHeight: number;
-  additionalNotes?: string;
+  AnalysisId: string;
+  MachineType: string;
+  Material?: string;
+  StockSize: { X: number; Y: number; Z: number; Unit: string };
+  Tools: ToolDefinition[];
+  WorkOffset: string;
+  WorkOffsetLocation: string;
+  OperationStrategy: string;
+  Coolant: string;
+  SafeZHeight: number;
+  AdditionalNotes?: string;
 }
 
 export interface ToolDefinition {
-  name: string;
-  diameter: number;
-  flutes: number;
-  material: string;
+  Name: string;
+  Diameter: number;
+  Flutes: number;
+  Material: string;
 }

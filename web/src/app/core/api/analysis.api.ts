@@ -10,7 +10,7 @@ export class AnalysisApi {
   private base = `${environment.apiBaseUrl}/analysis`;
 
   createGdAndT(documentId: string): Observable<DocumentAnalysisItem> {
-    return this.http.post<DocumentAnalysisItem>(`${this.base}/gdAndT`, { documentId });
+    return this.http.post<DocumentAnalysisItem>(`${this.base}/gdAndT`, { DocumentId: documentId });
   }
 
   listByDocumentId(docId: string): Observable<DocumentAnalysisListItem[]> {

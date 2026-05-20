@@ -38,15 +38,15 @@
         </div>
       </div>
     } @else {
-      @for (doc of documents(); track doc.id) {
-        <a class="table__row" [routerLink]="['/documents', doc.id]">
+      @for (doc of documents(); track doc.Id) {
+        <a class="table__row" [routerLink]="['/documents', doc.Id]">
           <span class="table__col table__col--name">
-            <span class="filename">{{ doc.fileName }}</span>
-            <span class="filename__id mono faint">{{ doc.id }}</span>
+            <span class="filename">{{ doc.FileName }}</span>
+            <span class="filename__id mono faint">{{ doc.Id }}</span>
           </span>
-          <span class="table__col table__col--meta mono faint">{{ shortHash(doc.fileHash) }}</span>
-          <span class="table__col table__col--size mono">{{ formatSize(doc.sizeBytes) }}</span>
-          <span class="table__col table__col--date mono">{{ formatDate(doc.createdOn) }}</span>
+          <span class="table__col table__col--meta mono faint">{{ shortHash(doc.FileHash) }}</span>
+          <span class="table__col table__col--size mono">{{ formatSize(doc.SizeBytes) }}</span>
+          <span class="table__col table__col--date mono">{{ formatDate(doc.CreatedOn) }}</span>
           <span class="table__col table__col--end">
             <span class="arrow">&rarr;</span>
           </span>

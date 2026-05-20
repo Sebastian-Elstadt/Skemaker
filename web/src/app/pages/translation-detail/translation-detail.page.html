@@ -1,5 +1,5 @@
 @if (translation(); as t) {
-  <a class="back" [routerLink]="['/analyses', t.analysisId]">&larr; Back to analysis</a>
+  <a class="back" [routerLink]="['/analyses', t.AnalysisId]">&larr; Back to analysis</a>
 }
 
 <header class="page-header">
@@ -8,10 +8,10 @@
     <h1>G-code translation</h1>
     @if (translation(); as t) {
       <div class="meta">
-        <span class="tag tag--accent">{{ targetLabel(t.target) }}</span>
+        <span class="tag tag--accent">{{ targetLabel(t.Target) }}</span>
         <span class="tag">{{ lineCount() }} lines</span>
-        <span class="mono faint">{{ t.id }}</span>
-        <span class="mono muted">{{ formatDate(t.createdOn) }}</span>
+        <span class="mono faint">{{ t.Id }}</span>
+        <span class="mono muted">{{ formatDate(t.CreatedOn) }}</span>
       </div>
     }
   </div>

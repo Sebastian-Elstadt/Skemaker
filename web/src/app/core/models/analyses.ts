@@ -1,18 +1,21 @@
 export type DocumentAnalysisType = 'GdAndT' | number;
 
 export interface DocumentAnalysisListItem {
-  analysisId: string;
-  analysisType: DocumentAnalysisType;
-  createdOn: string;
+  AnalysisId: string;
+  AnalysisType: DocumentAnalysisType;
+  CreatedOn: string;
 }
 
 export interface DocumentAnalysisItem {
-  analysisId: string;
-  createdOn: string;
-  analysisType: DocumentAnalysisType;
-  analysisJson: string;
+  AnalysisId: string;
+  CreatedOn: string;
+  AnalysisType: DocumentAnalysisType;
+  AnalysisJson: string;
 }
 
+// GdAndTAnalysis is parsed from DocumentAnalysisItem.AnalysisJson — its keys
+// come straight from the xAI structured-output response and are snake_case,
+// per the [JsonPropertyName] attributes on api/App/Analysis/DocumentGdAndTAnalysis.cs.
 export interface GdAndTAnalysis {
   part_name: string;
   part_number?: string;

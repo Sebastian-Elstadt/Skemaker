@@ -4,11 +4,11 @@
   <div class="page-header__top">
     <span class="page-header__eyebrow">PIPELINE / 02 — ANALYSIS</span>
     @if (document(); as d) {
-      <h1>{{ d.fileName }}</h1>
+      <h1>{{ d.FileName }}</h1>
       <div class="meta">
-        <span class="tag">{{ formatSize(d.sizeBytes) }}</span>
-        <span class="mono faint">{{ d.id }}</span>
-        <span class="mono muted">Uploaded {{ formatDate(d.createdOn) }}</span>
+        <span class="tag">{{ formatSize(d.SizeBytes) }}</span>
+        <span class="mono faint">{{ d.Id }}</span>
+        <span class="mono muted">Uploaded {{ formatDate(d.CreatedOn) }}</span>
       </div>
     } @else if (loadingDoc()) {
       <h1>Loading…</h1>
@@ -51,14 +51,14 @@
       </div>
     } @else {
       <ul class="analyses__list">
-        @for (a of analyses(); track a.analysisId) {
+        @for (a of analyses(); track a.AnalysisId) {
           <li>
-            <a class="analyses__item" [routerLink]="['/analyses', a.analysisId]">
+            <a class="analyses__item" [routerLink]="['/analyses', a.AnalysisId]">
               <span class="analyses__row">
-                <span class="tag tag--accent">{{ analysisLabel(a.analysisType) }}</span>
-                <span class="mono faint">{{ a.analysisId }}</span>
+                <span class="tag tag--accent">{{ analysisLabel(a.AnalysisType) }}</span>
+                <span class="mono faint">{{ a.AnalysisId }}</span>
               </span>
-              <span class="mono muted">{{ formatDate(a.createdOn) }}</span>
+              <span class="mono muted">{{ formatDate(a.CreatedOn) }}</span>
               <span class="arrow">&rarr;</span>
             </a>
           </li>

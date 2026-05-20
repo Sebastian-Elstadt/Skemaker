@@ -1,39 +1,24 @@
 <div class="app-shell">
-  <aside class="app-shell__sidebar">
-    <div class="brand">
+  <header class="app-shell__header">
+    <a routerLink="/documents" class="brand">
       <span class="brand__mark">SK</span>
       <div class="brand__text">
         <span class="brand__name">Skemaker</span>
         <span class="brand__sub">GD&amp;T &rarr; G-Code</span>
       </div>
-    </div>
+    </a>
 
-    <nav class="nav">
-      <a routerLink="/documents" routerLinkActive="nav__link--active" class="nav__link">
-        <span class="nav__index">01</span>
-        <span class="nav__label">Documents</span>
-      </a>
-      <a routerLink="/documents" class="nav__link nav__link--child">
-        <span class="nav__index">02</span>
-        <span class="nav__label muted">Analyses</span>
-      </a>
-      <a routerLink="/documents" class="nav__link nav__link--child">
-        <span class="nav__index">03</span>
-        <span class="nav__label muted">Translations</span>
-      </a>
-    </nav>
-
-    <div class="app-shell__footer">
-      <span class="footer__line">PIPELINE</span>
-      <span class="footer__pipeline">
-        <span class="footer__step">UPLOAD</span>
-        <span class="footer__sep">/</span>
-        <span class="footer__step">ANALYZE</span>
-        <span class="footer__sep">/</span>
-        <span class="footer__step">TRANSLATE</span>
+    <div class="pipeline">
+      <span class="pipeline__label">PIPELINE</span>
+      <span class="pipeline__steps">
+        <span class="pipeline__step">UPLOAD</span>
+        <span class="pipeline__sep">/</span>
+        <span class="pipeline__step">ANALYZE</span>
+        <span class="pipeline__sep">/</span>
+        <span class="pipeline__step">TRANSLATE</span>
       </span>
     </div>
-  </aside>
+  </header>
 
   <main class="app-shell__main">
     <router-outlet />
