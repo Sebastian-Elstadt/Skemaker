@@ -7,6 +7,13 @@ import { TranslationApi } from '../../core/api/translation.api';
 import { DocumentAnalysisItem, GdAndTAnalysis } from '../../core/models/analyses';
 import { AnalysisTranslationListItem, TranslateToGCodeRequest } from '../../core/models/translations';
 
+interface ToolFormItem {
+  name: string;
+  diameter: number;
+  flutes: number;
+  material: string;
+}
+
 interface TranslateForm {
   machineType: string;
   material: string;
@@ -20,10 +27,7 @@ interface TranslateForm {
   coolant: string;
   safeZHeight: number;
   additionalNotes: string;
-  toolName: string;
-  toolDiameter: number;
-  toolFlutes: number;
-  toolMaterial: string;
+  tools: ToolFormItem[];
 }
 
 @Component({
@@ -64,22 +68,22 @@ export class AnalysisDetailPage implements OnInit {
   });
 
   form: TranslateForm = {
-    machineType: '3-axis CNC mill',
-    material: 'Aluminum 6061-T6',
-    stockX: 100,
-    stockY: 100,
-    stockZ: 25,
-    stockUnit: 'mm',
+    machineType: '3-axis vertical mill',
+    material: '304 Stainless Steel',
+    stockX: 8.0,
+    stockY: 6.0,
+    stockZ: 0.25,
+    stockUnit: 'inch',
     workOffset: 'G54',
-    workOffsetLocation: 'top-center of stock',
-    operationStrategy: 'rough then finish',
+    workOffsetLocation: 'top_center',
+    operationStrategy: 'rough + finish',
     coolant: 'flood',
-    safeZHeight: 25,
-    additionalNotes: '',
-    toolName: 'End mill 6mm',
-    toolDiameter: 6,
-    toolFlutes: 3,
-    toolMaterial: 'carbide'
+    safeZHeight: 0.5,
+    additionalNotes: 'This is thin sheet metal (0.1195" thick). Prefer contour profiling over deep pocketing.',
+    tools: [
+      { name: '1/4" Flat End Mill', diameter: 0.25, flutes: 4, material: 'Carbide' },
+      { name: '1/8" Drill', diameter: 0.125, flutes: 2, material: 'HSS' }
+    ]
   };
 
   ngOnInit(): void {
@@ -93,7 +97,6 @@ export class AnalysisDetailPage implements OnInit {
       next: a => {
         this.analysis.set(a);
         this.loadingAnalysis.set(false);
-        this.prefillFromAnalysis();
       },
       error: err => {
         this.error.set(this.formatError(err));
@@ -116,17 +119,16 @@ export class AnalysisDetailPage implements OnInit {
     });
   }
 
-  prefillFromAnalysis(): void {
-    const p = this.parsed();
-    if (!p) return;
-    if (p.material) this.form.material = p.material;
-    if (p.overall_dimensions) {
-      const dims = p.overall_dimensions;
-      this.form.stockX = Math.ceil(dims.length);
-      this.form.stockY = Math.ceil(dims.width);
-      this.form.stockZ = Math.ceil(dims.height);
-      this.form.stockUnit = dims.unit || 'mm';
-    }
+  addTool(): void {
+    this.form.tools.push({ name: '', diameter: 0, flutes: 2, material: '' });
+  }
+
+  removeTool(index: number): void {
+    this.form.tools.splice(index, 1);
+  }
+
+  trackToolByIndex(index: number): number {
+    return index;
   }
 
   submit(): void {
@@ -136,12 +138,12 @@ export class AnalysisDetailPage implements OnInit {
       MachineType: this.form.machineType,
       Material: this.form.material || undefined,
       StockSize: { X: this.form.stockX, Y: this.form.stockY, Z: this.form.stockZ, Unit: this.form.stockUnit },
-      Tools: [{
-        Name: this.form.toolName,
-        Diameter: this.form.toolDiameter,
-        Flutes: this.form.toolFlutes,
-        Material: this.form.toolMaterial
-      }],
+      Tools: this.form.tools.map(t => ({
+        Name: t.name,
+        Diameter: t.diameter,
+        Flutes: t.flutes,
+        Material: t.material
+      })),
       WorkOffset: this.form.workOffset,
       WorkOffsetLocation: this.form.workOffsetLocation,
       OperationStrategy: this.form.operationStrategy,
@@ -151,6 +153,7 @@ export class AnalysisDetailPage implements OnInit {
     };
 
     this.translating.set(true);
+    this.showForm.set(false);
     this.error.set(null);
     this.translationApi.createGCode(req).subscribe({
       next: result => {
@@ -159,6 +162,7 @@ export class AnalysisDetailPage implements OnInit {
       },
       error: err => {
         this.translating.set(false);
+        this.showForm.set(true);
         this.error.set(this.formatError(err));
       }
     });

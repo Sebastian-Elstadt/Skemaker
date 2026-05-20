@@ -22,8 +22,8 @@
   </div>
 
   <div class="page-header__actions">
-    <button class="btn btn--accent" (click)="toggleForm()">
-      {{ showForm() ? 'Hide form' : 'Translate to G-code' }}
+    <button class="btn btn--accent" (click)="toggleForm()" [disabled]="translating()">
+      {{ translating() ? 'Translating…' : (showForm() ? 'Hide form' : 'Translate to G-code') }}
     </button>
   </div>
 </header>
@@ -32,7 +32,21 @@
   <div class="alert">{{ err }}</div>
 }
 
-@if (showForm()) {
+@if (translating()) {
+  <section class="running">
+    <div class="running__bar"><span></span></div>
+    <div class="running__content">
+      <h3>Translating to G-code…</h3>
+      <p>
+        The model is producing a strategy summary and full G-code program from the GD&amp;T analysis.
+        This typically takes <strong>1–2 minutes</strong>. You'll be taken to the result automatically.
+      </p>
+      <p class="muted running__hint">Leave this page open. Navigating away will cancel the request.</p>
+    </div>
+  </section>
+}
+
+@if (showForm() && !translating()) {
   <section class="surface-block form-block">
     <h4>G-CODE TRANSLATION PARAMETERS</h4>
     <p class="muted">These fields are sent to the translator alongside the extracted GD&amp;T.</p>
@@ -82,14 +96,33 @@
         </div>
       </div>
 
-      <fieldset class="tool">
-        <legend class="label">Primary tool</legend>
-        <div class="tool__row">
-          <input class="input" [(ngModel)]="form.toolName" placeholder="Name" />
-          <input class="input" type="number" [(ngModel)]="form.toolDiameter" placeholder="Ø mm" />
-          <input class="input" type="number" [(ngModel)]="form.toolFlutes" placeholder="Flutes" />
-          <input class="input" [(ngModel)]="form.toolMaterial" placeholder="Material" />
+      <fieldset class="tools">
+        <legend class="tools__legend">
+          <span class="label">Tools</span>
+          <button type="button" class="btn btn--sm" (click)="addTool()">+ Add tool</button>
+        </legend>
+
+        <div class="tools__head">
+          <span>Name</span>
+          <span>Ø ({{ form.stockUnit }})</span>
+          <span>Flutes</span>
+          <span>Material</span>
+          <span></span>
         </div>
+
+        @if (form.tools.length === 0) {
+          <p class="muted tools__empty">No tools defined. Add at least one tool for the translator to work with.</p>
+        }
+
+        @for (tool of form.tools; track trackToolByIndex($index); let i = $index) {
+          <div class="tools__row">
+            <input class="input" [(ngModel)]="tool.name" [name]="'toolName-' + i" placeholder="e.g. 1/4&quot; Flat End Mill" />
+            <input class="input" type="number" step="0.001" [(ngModel)]="tool.diameter" [name]="'toolDia-' + i" />
+            <input class="input" type="number" [(ngModel)]="tool.flutes" [name]="'toolFlutes-' + i" />
+            <input class="input" [(ngModel)]="tool.material" [name]="'toolMat-' + i" placeholder="Carbide / HSS" />
+            <button type="button" class="btn btn--ghost btn--sm tools__remove" (click)="removeTool(i)" title="Remove tool">×</button>
+          </div>
+        }
       </fieldset>
 
       <label class="full">

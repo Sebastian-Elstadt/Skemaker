@@ -1,9 +1,11 @@
-import { Component, Input, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TranslationApi } from '../../core/api/translation.api';
 import { AnalysisTranslationItem, GCodeTranslation } from '../../core/models/translations';
 import { GcodeViewerComponent } from '../../shared/gcode-viewer/gcode-viewer.component';
+
+const VIEWER_DEBOUNCE_MS = 350;
 
 @Component({
   selector: 'app-translation-detail-page',
@@ -12,7 +14,7 @@ import { GcodeViewerComponent } from '../../shared/gcode-viewer/gcode-viewer.com
   templateUrl: './translation-detail.page.html',
   styleUrl: './translation-detail.page.scss'
 })
-export class TranslationDetailPage implements OnInit {
+export class TranslationDetailPage implements OnInit, OnDestroy {
   @Input() id!: string;
 
   private api = inject(TranslationApi);
@@ -22,12 +24,24 @@ export class TranslationDetailPage implements OnInit {
   error = signal<string | null>(null);
   showStrategy = signal(true);
 
-  gcodeText = computed(() => this.translation()?.Translation.GCode ?? '');
+  /** Live text bound to the textarea; updates on every keystroke. */
+  gcodeText = signal<string>('');
+  /** Debounced copy fed to the 3D viewer to avoid re-parsing on every keystroke. */
+  viewerGcode = signal<string>('');
+  /** Whether the user has edited the loaded translation. */
+  dirty = signal(false);
+
   strategySummary = computed(() => this.translation()?.Translation.StrategySummary ?? '');
   lineCount = computed(() => this.gcodeText().split('\n').length);
 
+  private viewerDebounceId: ReturnType<typeof setTimeout> | null = null;
+
   ngOnInit(): void {
     this.load();
+  }
+
+  ngOnDestroy(): void {
+    if (this.viewerDebounceId) clearTimeout(this.viewerDebounceId);
   }
 
   load(): void {
@@ -35,6 +49,10 @@ export class TranslationDetailPage implements OnInit {
     this.api.getById(this.id).subscribe({
       next: t => {
         this.translation.set(t);
+        const code = t.Translation.GCode ?? '';
+        this.gcodeText.set(code);
+        this.viewerGcode.set(code);
+        this.dirty.set(false);
         this.loading.set(false);
       },
       error: err => {
@@ -42,6 +60,22 @@ export class TranslationDetailPage implements OnInit {
         this.loading.set(false);
       }
     });
+  }
+
+  onGcodeInput(event: Event): void {
+    const text = (event.target as HTMLTextAreaElement).value;
+    this.gcodeText.set(text);
+    this.dirty.set(text !== (this.translation()?.Translation.GCode ?? ''));
+
+    if (this.viewerDebounceId) clearTimeout(this.viewerDebounceId);
+    this.viewerDebounceId = setTimeout(() => this.viewerGcode.set(text), VIEWER_DEBOUNCE_MS);
+  }
+
+  resetEdits(): void {
+    const original = this.translation()?.Translation.GCode ?? '';
+    this.gcodeText.set(original);
+    this.viewerGcode.set(original);
+    this.dirty.set(false);
   }
 
   copyGCode(): void {

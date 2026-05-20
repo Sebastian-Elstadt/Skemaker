@@ -18,7 +18,9 @@
 
   <div class="page-header__actions">
     <button class="btn" (click)="copyGCode()" [disabled]="!gcodeText()">Copy</button>
-    <button class="btn btn--primary" (click)="download()" [disabled]="!gcodeText()">Download .gcode</button>
+    <button class="btn btn--primary" (click)="download()" [disabled]="!gcodeText()">
+      Download .gcode
+    </button>
   </div>
 </header>
 
@@ -46,10 +48,30 @@
   <div class="viewer-grid">
     <section class="pane pane--code">
       <header class="pane__head">
-        <h4>G-CODE</h4>
-        <span class="mono faint">{{ lineCount() }} lines</span>
+        <h4>G-CODE <span class="pane__sub">editable</span></h4>
+        <span class="pane__meta">
+          @if (dirty()) {
+            <button
+              class="btn btn--ghost btn--sm"
+              (click)="resetEdits()"
+              title="Revert to original"
+            >
+              Reset
+            </button>
+            <span class="tag tag--accent">edited</span>
+          }
+          <span class="mono faint">{{ lineCount() }} lines</span>
+        </span>
       </header>
-      <pre class="pane__body code-block">{{ gcodeText() }}</pre>
+      <textarea
+        class="pane__body code-editor"
+        spellcheck="false"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        [value]="gcodeText()"
+        (input)="onGcodeInput($event)"
+      ></textarea>
     </section>
 
     <section class="pane pane--viewer">
@@ -58,7 +80,7 @@
         <span class="mono faint">3D RENDER</span>
       </header>
       <div class="pane__body viewer-body">
-        <app-gcode-viewer [gcodeText]="gcodeText()" />
+        <app-gcode-viewer [gcodeText]="viewerGcode()" />
       </div>
     </section>
   </div>
