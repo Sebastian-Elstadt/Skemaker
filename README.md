@@ -8,6 +8,14 @@ PDF drawing  ──▶  GD&T analysis (JSON)  ──▶  G-code program
                   callouts, tolerances        full numbered program
 ```
 
+## A note on intent
+
+This is a curiosity / learning project — built to see how far a vision LLM could be pushed end-to-end, not to ship a production CAM tool. The LLM-driven G-code step is deliberately the wrong tool for the job: real CAM generates toolpaths from a deterministic geometry kernel (parsing a STEP/BREP model, computing offsets, scheduling tool engagement) rather than asking a language model to author motion commands. Doing it this way was the experiment.
+
+As a result, **the generated programs are not useful**. The toolpaths the LLM emits produce a garbage mesh when rendered — the moves are plausible-looking but not geometrically faithful to the drawing, and the strategy choices are not what a real CAM post-processor would produce. A serious version of this would (a) ingest a STEP file alongside the PDF so the model has actual 3D geometry to reason about, and (b) hand the geometry off to a deterministic toolpath generator, using the LLM only for the parts it's good at — reading the drawing, summarizing GD&T callouts, and proposing a high-level strategy.
+
+The rest of this README documents what's here.
+
 ## Repository layout
 
 ```
